@@ -1,0 +1,15 @@
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\bin\Debug\net10.0\Voxta.ProtocolGenerator.exe
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\bin\Debug\net10.0\Voxta.ProtocolGenerator.deps.json
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\bin\Debug\net10.0\Voxta.ProtocolGenerator.runtimeconfig.json
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\bin\Debug\net10.0\Voxta.ProtocolGenerator.dll
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\bin\Debug\net10.0\Voxta.ProtocolGenerator.pdb
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\obj\Debug\net10.0\Voxta.ProtocolGenerator.GeneratedMSBuildEditorConfig.editorconfig
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\obj\Debug\net10.0\Voxta.ProtocolGenerator.AssemblyInfoInputs.cache
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\obj\Debug\net10.0\Voxta.ProtocolGenerator.AssemblyInfo.cs
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\obj\Debug\net10.0\Voxta.ProtocolGenerator.csproj.CoreCompileInputs.cache
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\obj\Debug\net10.0\Voxta.ProtocolGenerator.sourcelink.json
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\obj\Debug\net10.0\Voxta.ProtocolGenerator.dll
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\obj\Debug\net10.0\refint\Voxta.ProtocolGenerator.dll
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\obj\Debug\net10.0\Voxta.ProtocolGenerator.pdb
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\obj\Debug\net10.0\Voxta.ProtocolGenerator.genruntimeconfig.cache
+G:\voxta-projects\GitHub\voxta-game-engine-sdk\Tools\ProtocolGenerator\obj\Debug\net10.0\ref\Voxta.ProtocolGenerator.dll

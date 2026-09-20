@@ -1,0 +1,14 @@
+<linker>
+  <!--
+    Unity consumes linker configurations from Assets, not UPM packages. Importing
+    this sample places this file under Assets/Samples, where it preserves the
+    SignalR members HubConnection discovers through reflection at startup.
+  -->
+  <assembly fullname="Microsoft.AspNetCore.SignalR.Client" preserve="all" />
+  <assembly fullname="Microsoft.AspNetCore.SignalR.Client.Core" preserve="all" />
+  <assembly fullname="Microsoft.AspNetCore.SignalR.Protocols.Json" preserve="all" />
+  <assembly fullname="Microsoft.AspNetCore.Http.Connections.Client" preserve="all" />
+  <assembly fullname="Microsoft.AspNetCore.Http.Connections.Common" preserve="all" />
+  <assembly fullname="System.Text.Json" preserve="all" />
+  <assembly fullname="Voxta.Unity.Runtime" preserve="all" />
+</linker>

@@ -1,0 +1,10 @@
+<linker>
+  <!-- SignalR locates transport and protocol implementations through reflection. -->
+  <assembly fullname="Microsoft.AspNetCore.SignalR.Client" preserve="all" />
+  <assembly fullname="Microsoft.AspNetCore.SignalR.Client.Core" preserve="all" />
+  <assembly fullname="Microsoft.AspNetCore.SignalR.Protocols.Json" preserve="all" />
+  <assembly fullname="Microsoft.AspNetCore.Http.Connections.Client" preserve="all" />
+  <assembly fullname="Microsoft.AspNetCore.Http.Connections.Common" preserve="all" />
+  <assembly fullname="System.Text.Json" preserve="all" />
+  <assembly fullname="Voxta.Unity.Runtime" preserve="all" />
+</linker>

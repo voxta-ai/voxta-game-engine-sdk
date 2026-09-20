@@ -1,0 +1,14 @@
+{
+  "name": "Voxta.Unity.Editor",
+  "rootNamespace": "Voxta.Unity.Editor",
+  "references": ["Voxta.Unity.Runtime"],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
