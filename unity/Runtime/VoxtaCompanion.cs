@@ -10,10 +10,12 @@ namespace Voxta.Unity
     [Serializable] public sealed class VoxtaChatStartedUnityEvent : UnityEvent<ServerChatStartedMessage> { }
     [Serializable] public sealed class VoxtaReplyChunkUnityEvent : UnityEvent<ServerReplyChunkMessage> { }
     [Serializable] public sealed class VoxtaReplyCompleteUnityEvent : UnityEvent<ServerReplyEndMessage> { }
+    [Serializable] public sealed class VoxtaSpeechMetricsUnityEvent : UnityEvent<VoxtaSpeechPlaybackMetrics> { }
+    [Serializable] public sealed class VoxtaSpeechMessageUnityEvent : UnityEvent<string> { }
     [Serializable] public sealed class VoxtaErrorUnityEvent : UnityEvent<string> { }
     [Serializable] public sealed class VoxtaDiagnosticUnityEvent : UnityEvent<string> { }
 
-    /// <summary>Text-only M1 Unity component that owns one Voxta connection and chat session.</summary>
+    /// <summary>Owns one Voxta connection, chat session, and optional Unity speech playback path.</summary>
     public sealed class VoxtaCompanion : MonoBehaviour
     {
         [Header("Connection")]
@@ -24,7 +26,8 @@ namespace Voxta.Unity
         [SerializeField] private string scenarioId = "";
         [Header("Capabilities")]
         [SerializeField] private AudioInputClientCapabilities audioInput = AudioInputClientCapabilities.None;
-        [SerializeField] private AudioOutputClientCapabilities audioOutput = AudioOutputClientCapabilities.None;
+        [Tooltip("Use the server's local audio output. This disables Unity playback and reports audioOutput: None.")]
+        [SerializeField] private bool localServerAudioOutput;
         [SerializeField] private VisionCaptureClientCapabilities visionCapture = VisionCaptureClientCapabilities.None;
         [Header("Events")]
         [SerializeField] private VoxtaConnectionStateUnityEvent onConnectionStateChanged = new VoxtaConnectionStateUnityEvent();
@@ -32,22 +35,32 @@ namespace Voxta.Unity
         [SerializeField] private VoxtaChatStartedUnityEvent onChatStarted = new VoxtaChatStartedUnityEvent();
         [SerializeField] private VoxtaReplyChunkUnityEvent onReplyChunk = new VoxtaReplyChunkUnityEvent();
         [SerializeField] private VoxtaReplyCompleteUnityEvent onReplyComplete = new VoxtaReplyCompleteUnityEvent();
+        [SerializeField] private VoxtaSpeechMetricsUnityEvent onSpeechStart = new VoxtaSpeechMetricsUnityEvent();
+        [SerializeField] private VoxtaSpeechMessageUnityEvent onSpeechEnd = new VoxtaSpeechMessageUnityEvent();
+        [SerializeField] private VoxtaSpeechMessageUnityEvent onSpeechInterrupted = new VoxtaSpeechMessageUnityEvent();
         [SerializeField] private VoxtaErrorUnityEvent onError = new VoxtaErrorUnityEvent();
         [SerializeField] private VoxtaDiagnosticUnityEvent onDiagnostic = new VoxtaDiagnosticUnityEvent();
 
         private VoxtaClient client;
         private VoxtaChatSession session;
+        private VoxtaSpeechPlayer speechPlayer;
 
         public event Action<VoxtaConnectionState> ConnectionStateChanged;
         public event Action<ServerWelcomeMessage> WelcomeReceived;
         public event Action<ServerChatStartedMessage> ChatStarted;
         public event Action<ServerReplyChunkMessage> ReplyChunkReceived;
         public event Action<ServerReplyEndMessage> ReplyCompleted;
+        public event Action<ServerReplyChunkMessage, VoxtaSpeechPlaybackMetrics> SpeechStarted;
+        public event Action<Guid> SpeechEnded;
+        public event Action<Guid> SpeechInterrupted;
         public event Action<Exception> Error;
         public event Action<string> Diagnostic;
 
         public VoxtaConnectionState ConnectionState => client == null ? VoxtaConnectionState.Disconnected : client.State;
         public VoxtaChatSession ChatSession => session;
+        public VoxtaSpeechPlayer SpeechPlayer => speechPlayer;
+
+        private void Awake() => speechPlayer = GetComponent<VoxtaSpeechPlayer>();
 
         private void OnEnable()
         {
@@ -57,6 +70,13 @@ namespace Voxta.Unity
 
         private async void OnDisable()
         {
+            if (speechPlayer != null)
+            {
+                speechPlayer.SpeechStarted -= HandleSpeechStarted;
+                speechPlayer.SpeechEnded -= HandleSpeechEnded;
+                speechPlayer.SpeechInterrupted -= HandleSpeechInterrupted;
+                speechPlayer.Unbind();
+            }
             if (session != null) { session.Dispose(); session = null; }
             if (client != null) { await client.DisposeAsync(); client = null; }
         }
@@ -68,8 +88,23 @@ namespace Voxta.Unity
             {
                 if (!Uri.TryCreate(serverUrl, UriKind.Absolute, out var uri)) throw new ArgumentException("Server URL must be an absolute HTTP or WebSocket URL.", nameof(serverUrl));
                 ReportDiagnostic("Opening SignalR connection to " + Transport.VoxtaWebsocketUrl.ToHubUri(uri));
-                client = new VoxtaClient(uri, apiKey, new ClientCapabilities { AudioInput = audioInput, AudioOutput = audioOutput, VisionCapture = visionCapture });
+                if (speechPlayer == null) speechPlayer = GetComponent<VoxtaSpeechPlayer>();
+                var unityPlaybackActive = speechPlayer != null && speechPlayer.IsOutputEnabled && !localServerAudioOutput;
+                ReportDiagnostic(DescribeAudioOutput(unityPlaybackActive));
+                client = new VoxtaClient(uri, apiKey, new ClientCapabilities
+                {
+                    AudioInput = audioInput,
+                    AudioOutput = unityPlaybackActive ? AudioOutputClientCapabilities.Url : AudioOutputClientCapabilities.None,
+                    VisionCapture = visionCapture
+                });
                 session = new VoxtaChatSession(client);
+                if (unityPlaybackActive)
+                {
+                    speechPlayer.Bind(client, session, uri);
+                    speechPlayer.SpeechStarted += HandleSpeechStarted;
+                    speechPlayer.SpeechEnded += HandleSpeechEnded;
+                    speechPlayer.SpeechInterrupted += HandleSpeechInterrupted;
+                }
                 client.ConnectionStateChanged += HandleConnectionState;
                 client.WelcomeReceived += HandleWelcome;
                 client.WelcomeReceived += _ => StartConfiguredChat();
@@ -82,7 +117,18 @@ namespace Voxta.Unity
             catch (Exception exception) { HandleError(exception); }
         }
 
-        public void SendText(string text) { try { session?.SendText(text); } catch (Exception exception) { HandleError(exception); } }
+        /// <summary>Interrupts an active Unity reply before submitting the next user turn.</summary>
+        public void SendText(string text)
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(text) && speechPlayer != null && speechPlayer.HasActiveReply)
+                    speechPlayer.Interrupt();
+                session?.SendText(text);
+            }
+            catch (Exception exception) { HandleError(exception); }
+        }
+        public void InterruptSpeech() { try { speechPlayer?.Interrupt(); } catch (Exception exception) { HandleError(exception); } }
         public async void Disconnect() { if (client == null) return; try { await client.DisconnectAsync(); } catch (Exception exception) { HandleError(exception); } }
         private void StartConfiguredChat()
         {
@@ -110,6 +156,17 @@ namespace Voxta.Unity
         private void HandleChatStarted(ServerChatStartedMessage value) { ReportDiagnostic("Chat started: " + value.ChatId); ChatStarted?.Invoke(value); onChatStarted.Invoke(value); }
         private void HandleReplyChunk(ServerReplyChunkMessage value) { ReplyChunkReceived?.Invoke(value); onReplyChunk.Invoke(value); }
         private void HandleReplyCompleted(ServerReplyEndMessage value) { ReplyCompleted?.Invoke(value); onReplyComplete.Invoke(value); }
+        private void HandleSpeechStarted(ServerReplyChunkMessage chunk, VoxtaSpeechPlaybackMetrics metrics) { SpeechStarted?.Invoke(chunk, metrics); onSpeechStart.Invoke(metrics); }
+        private void HandleSpeechEnded(Guid messageId) { SpeechEnded?.Invoke(messageId); onSpeechEnd.Invoke(messageId.ToString()); }
+        private void HandleSpeechInterrupted(Guid messageId) { SpeechInterrupted?.Invoke(messageId); onSpeechInterrupted.Invoke(messageId.ToString()); }
+        private string DescribeAudioOutput(bool unityPlaybackActive)
+        {
+            if (unityPlaybackActive) return "Unity speech playback is enabled; advertising audioOutput: Url.";
+            if (localServerAudioOutput) return "Unity speech playback is disabled by Local Server Audio Output; advertising audioOutput: None for server-side output.";
+            if (speechPlayer == null) return "Unity speech playback is disabled because this companion has no enabled VoxtaSpeechPlayer component; advertising audioOutput: None.";
+            if (!speechPlayer.enabled || !speechPlayer.gameObject.activeInHierarchy) return "Unity speech playback is disabled because VoxtaSpeechPlayer is disabled or its GameObject is inactive; advertising audioOutput: None.";
+            return "Unity speech playback is disabled because VoxtaSpeechPlayer has no enabled AudioSource; advertising audioOutput: None.";
+        }
         private void HandleError(Exception exception)
         {
             Debug.LogError("Voxta error: " + exception, this);

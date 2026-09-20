@@ -9,5 +9,16 @@ The imported sample includes the required IL2CPP linker configuration. If you us
 project's `Assets` directory before creating an IL2CPP build. Unity does not apply
 `link.xml` files stored inside UPM packages.
 
-The sample is intentionally text-only for M1. It uses a `VoxtaCompanion` and a small
-UGUI binding script; no microphone, speech playback, or device flow is included.
+The companion includes `VoxtaSpeechPlayer` and an `AudioSource`. With **Local Server
+Audio Output** disabled, it advertises `audioOutput: Url`, downloads reply audio, and
+plays it through that source. On a local server, also configure **Audio Output** to use
+the client capability; a server setting that prefers its own Audio Output service
+overrides `audioOutput: Url` and plays sound outside Unity. No microphone or device
+flow is included.
+
+Samples already imported into `Assets/Samples/` are copies. Re-import the sample,
+or add an enabled `VoxtaSpeechPlayer` alongside the `AudioSource` on your existing
+**Voxta Companion** object, after updating the package.
+
+The sample also includes an `AudioListener`. A Unity scene must have exactly one
+enabled listener; remove this one if your camera already has an `AudioListener`.

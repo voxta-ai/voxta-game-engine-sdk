@@ -76,26 +76,45 @@ The SDK owns its transport implementation under `Runtime/Transport/`. It bundles
 - [x] Create `Samples~/BasicIntegration` and make the existing `package.json` sample declaration resolve to it.
 - [x] Add a sample scene with a companion, text input, send button, streamed reply view, and connection/error status.
 - [x] Verify a fresh Unity 2022.3 project installs the package by local path and can complete a text chat against the pinned local server.
-- [ ] Verify a clean IL2CPP player build completes without stripping or serialization errors.
+- [x] Verify a clean IL2CPP player build completes without stripping or serialization errors.
 
 ## M2 — Protocol contract v0
 
-- [ ] Create `Documentation~/protocol-v0.md`.
-- [ ] Document server URL normalization, `/hub` connection, bearer token transport, and authenticate/welcome exchange.
-- [ ] Document capability negotiation and the M1 capability profile.
-- [ ] Add sequence diagrams for start chat, text send, streamed reply, interruption, and reconnect.
-- [ ] Document `$type` discriminator rules and unknown-message handling.
-- [ ] Document the minimal REST endpoints needed for device authorization and audio downloads.
-- [ ] Record protocol ambiguities found during M1 and open upstream server issues or pull requests where needed.
+- [x] Create `Documentation~/protocol-v0.md`.
+- [x] Document server URL normalization, `/hub` connection, bearer token transport, and authenticate/welcome exchange.
+- [x] Document capability negotiation and the M1 capability profile.
+- [x] Add sequence diagrams for start chat, text send, streamed reply, interruption, and reconnect.
+- [x] Document `$type` discriminator rules and unknown-message handling.
+- [x] Document the minimal REST endpoints needed for device authorization and audio downloads.
+- [x] Record protocol ambiguities found during M1 and open upstream server issues or pull requests where needed.
 
 ## M3 — Speech and microphone
 
-- [ ] Port the behavioral state machine from `Voxta.Client/SpeechPlayback.cs`.
-- [ ] Implement a Unity speech audio output adapter using `UnityWebRequestMultimedia`, `AudioClip`, and `AudioSource`.
-- [ ] Prefetch the next reply chunk and honor `AudioGapMs` as a minimum inter-clip gap.
-- [ ] Send `speechPlaybackStart` with measured duration for every chunk.
-- [ ] Send `speechPlaybackComplete` only after natural completion; handle server and player interruption correctly.
-- [ ] Surface speech start/end and optional playback metrics for lip-sync consumers.
+- [x] Port the behavioral state machine from `Voxta.Client/SpeechPlayback.cs`.
+- [x] Implement a Unity speech audio output adapter using `UnityWebRequestMultimedia`, `AudioClip`, and `AudioSource`.
+- [x] Prefetch the next reply chunk and honor `AudioGapMs` as a minimum inter-clip gap.
+- [x] Send `speechPlaybackStart` with measured duration for every chunk.
+- [x] Send `speechPlaybackComplete` for every reply after natural completion or interruption; handle server and player interruption correctly.
+- [x] Surface speech start/end and optional playback metrics for lip-sync consumers.
+
+### Speech playback implementation status
+
+The Unity implementation and generated protocol expansion are verified by a
+live-server run: URL download, audible `AudioSource` playback, per-chunk start
+metrics, natural completion, received `audioGapMs`, and both interruption paths
+completed successfully. Automated runtime tests also cover completion
+acknowledgement and interruption state transitions without an audio device or
+HTTP decoder. The current local-server debugging established these contract facts:
+
+- A `VoxtaSpeechPlayer`, enabled `AudioSource`, and exactly one enabled
+  `AudioListener` are required in the scene.
+- The player advertises `audioOutput: Url` only when that local playback path
+  is configured. A local server can still choose its Audio Output service when
+  `PreferClientCapability` is false.
+- Deferred `/api/tts/gens/{id}` URLs have no extension. Unity therefore
+  advertises and requests `audio/x-wav`, and decodes the response as
+  `AudioType.WAV`.
+
 - [ ] Implement `VoxtaMicrophone` capture, PCM16 conversion, and audio-stream WebSocket startup frame.
 - [ ] Stream microphone audio and silence markers to `/ws/audio/input/stream`.
 - [ ] Surface speech-recognition and VAD/audio-frame events.
@@ -139,4 +158,9 @@ The SDK owns its transport implementation under `Runtime/Transport/`. It bundles
 | 2026-09-19 | M1 client, chat session, and transport tests | Unity 2022.3.62f3 Test Runner, `voxtaSDK-sandbox` | All runtime tests passed after changing the lifecycle test from an unsupported `async Task` test to a synchronous test over the completed fake transport. |
 | 2026-09-19 | M1 local text-chat integration | Unity 2022.3.62f3 Play mode, local Voxta server | The companion authenticated, started a chat from a character GUID, sent text, received streamed replies, and displayed the replies in the sample UI. |
 | 2026-09-19 | M1 fresh local-path integration | Fresh Unity 2022.3 project | The package installed by local path, the BasicIntegration sample installed, and the local-server text chat completed successfully. |
+| 2026-09-20 | M1 IL2CPP player integration | Unity 2022.3.62f3 Windows IL2CPP player, `G:\Unity\VoxtaSDK-test-build` | After importing the sample's Assets-level SignalR linker configuration, the built player connected, started the configured chat, and exchanged text exactly as in Play mode. |
+| 2026-09-20 | M2 protocol contract v0 | `Documentation~/protocol-v0.md`; transport, generated M1 DTOs, and pinned server/client references reviewed | Documents verified M1 behavior, M3 protocol targets, and remaining compatibility questions. No M1 server defect required an upstream issue or pull request. |
+| 2026-09-20 | M3 speech playback implementation | `Runtime/VoxtaSpeechPlayer.cs`, generated M3 protocol subset, and BasicIntegration sample | Implemented the Unity playback state machine, capability selection, lifecycle events, WAV deferred-URL decoding, and sample audio components. Unity compilation passed before the final live-server decoder/routing fixes; live playback and interruption verification remains in progress. |
+| 2026-09-20 | M3 automated playback lifecycle tests | Unity Test Runner, `voxtaSDK-sandbox` | All 27 runtime tests passed after adding `replyStart`, interrupted-completion, and player/server interruption cases. |
+| 2026-09-20 | M3 live Unity playback and interruption | Unity 2022.3 Play mode, local Voxta server and Voxta Talk | Unity downloaded and played reply audio through its `AudioSource`; natural completion and received `audioGapMs` behavior were observed. A playback-start diagnostic reported a decoded duration of `2.339s`. Text interruption and Voxta Talk interruption of the same chat both stopped Unity immediately, sent one completion, and allowed the chat to continue. |
 | | | | |

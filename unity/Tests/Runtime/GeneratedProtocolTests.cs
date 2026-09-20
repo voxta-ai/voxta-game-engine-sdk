@@ -21,6 +21,14 @@ namespace Voxta.Unity.Tests
         }
 
         [Test]
+        public void UnityUrlPlaybackAdvertisesOnlyWav()
+        {
+            var capabilities = new ClientCapabilities();
+
+            CollectionAssert.AreEqual(new[] { "audio/x-wav" }, capabilities.AcceptedAudioContentTypes);
+        }
+
+        [Test]
         public void ConcreteAuthenticateMessageWritesPinnedDiscriminator()
         {
             var json = JsonSerializer.Serialize(new ClientAuthenticateMessage
@@ -45,11 +53,31 @@ namespace Voxta.Unity.Tests
             StringAssert.Contains("\"role\":3", json);
         }
 
+        [Test]
+        public void SpeechMessagesWritePinnedDiscriminatorsAndFields()
+        {
+            var start = JsonSerializer.Serialize<ClientMessage>(new ClientSpeechPlaybackStartMessage
+            {
+                SessionId = Guid.NewGuid(), MessageId = Guid.NewGuid(), StartIndex = 2, EndIndex = 7,
+                Duration = 1.25d, IsNarration = true
+            }, VoxtaJson.CreateOptions());
+            var interrupt = JsonSerializer.Serialize<ClientMessage>(new ClientInterruptMessage { SessionId = Guid.NewGuid() }, VoxtaJson.CreateOptions());
+
+            StringAssert.Contains("\"$type\":\"speechPlaybackStart\"", start);
+            StringAssert.Contains("\"duration\":1.25", start);
+            StringAssert.Contains("\"isNarration\":true", start);
+            StringAssert.Contains("\"$type\":\"interrupt\"", interrupt);
+        }
+
         [TestCase("welcome", typeof(ServerWelcomeMessage))]
         [TestCase("authenticationRequired", typeof(ServerAuthenticationRequiredMessage))]
         [TestCase("chatStarted", typeof(ServerChatStartedMessage))]
+        [TestCase("replyStart", typeof(ServerReplyStartMessage))]
         [TestCase("replyChunk", typeof(ServerReplyChunkMessage))]
         [TestCase("replyEnd", typeof(ServerReplyEndMessage))]
+        [TestCase("speechPlaybackStart", typeof(ServerSpeechPlaybackStartMessage))]
+        [TestCase("speechPlaybackComplete", typeof(ServerSpeechPlaybackCompleteMessage))]
+        [TestCase("interruptSpeech", typeof(ServerInterruptSpeechMessage))]
         public void ServerMessageReadsPinnedDiscriminator(string discriminator, Type expectedType)
         {
             var json = "{\"$type\":\"" + discriminator + "\",\"sessionId\":\"00000000-0000-0000-0000-000000000000\"}";

@@ -17,6 +17,11 @@ namespace Voxta.Unity.Samples.BasicIntegration
             status = companion.ConnectionState.ToString();
             companion.ReplyChunkReceived += chunk => transcript += chunk.Text;
             companion.ReplyCompleted += _ => transcript += "\n";
+            companion.SpeechStarted += (_, metrics) => AddDiagnostic(
+                "Speech started: " + metrics.MessageId + " [" + metrics.StartIndex + ", " + metrics.EndIndex
+                + "), " + metrics.DurationSeconds.ToString("F3") + "s");
+            companion.SpeechEnded += messageId => AddDiagnostic("Speech completed: " + messageId);
+            companion.SpeechInterrupted += messageId => AddDiagnostic("Speech interrupted: " + messageId);
             companion.ConnectionStateChanged += value => { status = value.ToString(); AddDiagnostic("Connection state: " + value); };
             companion.Error += exception => { status = exception.Message; AddDiagnostic("ERROR: " + exception); };
             companion.Diagnostic += AddDiagnostic;
