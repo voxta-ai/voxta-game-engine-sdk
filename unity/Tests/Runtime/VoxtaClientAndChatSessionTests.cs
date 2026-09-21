@@ -106,6 +106,24 @@ namespace Voxta.Unity.Tests
             Assert.That(sent.Text, Is.EqualTo("reply"));
         }
 
+        [Test]
+        public void FinalRecognizedTextUsesTheNormalChatSendContract()
+        {
+            var transport = new FakeTransport();
+            var client = new VoxtaClient(transport);
+            var session = new VoxtaChatSession(client);
+            var sessionId = Guid.NewGuid();
+
+            transport.Receive(new ServerChatStartedMessage { SessionId = sessionId, ChatId = Guid.NewGuid() });
+            UnityMainThreadDispatcher.DrainPending();
+            session.SendText("recognized final transcript");
+
+            var sent = (ClientSendMessage)transport.Sent[0];
+            Assert.That(sent.SessionId, Is.EqualTo(sessionId));
+            Assert.That(sent.Text, Is.EqualTo("recognized final transcript"));
+            Assert.That(sent.Role, Is.EqualTo(ChatMessageRole.User));
+        }
+
         private sealed class FakeTransport : IVoxtaTransport
         {
             public event Action<ServerMessage> MessageReceived;

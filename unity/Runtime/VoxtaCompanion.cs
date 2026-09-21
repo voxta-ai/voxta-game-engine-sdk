@@ -12,6 +12,9 @@ namespace Voxta.Unity
     [Serializable] public sealed class VoxtaReplyCompleteUnityEvent : UnityEvent<ServerReplyEndMessage> { }
     [Serializable] public sealed class VoxtaSpeechMetricsUnityEvent : UnityEvent<VoxtaSpeechPlaybackMetrics> { }
     [Serializable] public sealed class VoxtaSpeechMessageUnityEvent : UnityEvent<string> { }
+    [Serializable] public sealed class VoxtaRecognitionPartialUnityEvent : UnityEvent<string> { }
+    [Serializable] public sealed class VoxtaRecognitionEndUnityEvent : UnityEvent<string> { }
+    [Serializable] public sealed class VoxtaAudioFrameUnityEvent : UnityEvent<ServerAudioFrameMessage> { }
     [Serializable] public sealed class VoxtaErrorUnityEvent : UnityEvent<string> { }
     [Serializable] public sealed class VoxtaDiagnosticUnityEvent : UnityEvent<string> { }
 
@@ -25,7 +28,6 @@ namespace Voxta.Unity
         [SerializeField] private string characterId = "";
         [SerializeField] private string scenarioId = "";
         [Header("Capabilities")]
-        [SerializeField] private AudioInputClientCapabilities audioInput = AudioInputClientCapabilities.None;
         [Tooltip("Use the server's local audio output. This disables Unity playback and reports audioOutput: None.")]
         [SerializeField] private bool localServerAudioOutput;
         [SerializeField] private VisionCaptureClientCapabilities visionCapture = VisionCaptureClientCapabilities.None;
@@ -38,12 +40,17 @@ namespace Voxta.Unity
         [SerializeField] private VoxtaSpeechMetricsUnityEvent onSpeechStart = new VoxtaSpeechMetricsUnityEvent();
         [SerializeField] private VoxtaSpeechMessageUnityEvent onSpeechEnd = new VoxtaSpeechMessageUnityEvent();
         [SerializeField] private VoxtaSpeechMessageUnityEvent onSpeechInterrupted = new VoxtaSpeechMessageUnityEvent();
+        [SerializeField] private UnityEvent onRecognitionStarted = new UnityEvent();
+        [SerializeField] private VoxtaRecognitionPartialUnityEvent onRecognitionPartial = new VoxtaRecognitionPartialUnityEvent();
+        [SerializeField] private VoxtaRecognitionEndUnityEvent onRecognitionEnded = new VoxtaRecognitionEndUnityEvent();
+        [SerializeField] private VoxtaAudioFrameUnityEvent onAudioFrame = new VoxtaAudioFrameUnityEvent();
         [SerializeField] private VoxtaErrorUnityEvent onError = new VoxtaErrorUnityEvent();
         [SerializeField] private VoxtaDiagnosticUnityEvent onDiagnostic = new VoxtaDiagnosticUnityEvent();
 
         private VoxtaClient client;
         private VoxtaChatSession session;
         private VoxtaSpeechPlayer speechPlayer;
+        private VoxtaMicrophone microphone;
 
         public event Action<VoxtaConnectionState> ConnectionStateChanged;
         public event Action<ServerWelcomeMessage> WelcomeReceived;
@@ -53,14 +60,23 @@ namespace Voxta.Unity
         public event Action<ServerReplyChunkMessage, VoxtaSpeechPlaybackMetrics> SpeechStarted;
         public event Action<Guid> SpeechEnded;
         public event Action<Guid> SpeechInterrupted;
+        public event Action RecognitionStarted;
+        public event Action<ServerSpeechRecognitionPartialMessage> RecognitionPartialReceived;
+        public event Action<ServerSpeechRecognitionEndMessage> RecognitionEnded;
+        public event Action<ServerAudioFrameMessage> AudioFrameReceived;
         public event Action<Exception> Error;
         public event Action<string> Diagnostic;
 
         public VoxtaConnectionState ConnectionState => client == null ? VoxtaConnectionState.Disconnected : client.State;
         public VoxtaChatSession ChatSession => session;
         public VoxtaSpeechPlayer SpeechPlayer => speechPlayer;
+        public VoxtaMicrophone Microphone => microphone;
 
-        private void Awake() => speechPlayer = GetComponent<VoxtaSpeechPlayer>();
+        private void Awake()
+        {
+            speechPlayer = GetComponent<VoxtaSpeechPlayer>();
+            microphone = GetComponent<VoxtaMicrophone>();
+        }
 
         private void OnEnable()
         {
@@ -77,6 +93,17 @@ namespace Voxta.Unity
                 speechPlayer.SpeechInterrupted -= HandleSpeechInterrupted;
                 speechPlayer.Unbind();
             }
+            if (microphone != null)
+            {
+                microphone.CaptureStarted -= HandleCaptureStarted;
+                microphone.CaptureStopped -= HandleCaptureStopped;
+                microphone.RecognitionStarted -= HandleRecognitionStarted;
+                microphone.RecognitionPartial -= HandleRecognitionPartial;
+                microphone.RecognitionEnded -= HandleRecognitionEnded;
+                microphone.AudioFrameReceived -= HandleAudioFrame;
+                microphone.Error -= HandleError;
+                microphone.Unbind();
+            }
             if (session != null) { session.Dispose(); session = null; }
             if (client != null) { await client.DisposeAsync(); client = null; }
         }
@@ -89,11 +116,14 @@ namespace Voxta.Unity
                 if (!Uri.TryCreate(serverUrl, UriKind.Absolute, out var uri)) throw new ArgumentException("Server URL must be an absolute HTTP or WebSocket URL.", nameof(serverUrl));
                 ReportDiagnostic("Opening SignalR connection to " + Transport.VoxtaWebsocketUrl.ToHubUri(uri));
                 if (speechPlayer == null) speechPlayer = GetComponent<VoxtaSpeechPlayer>();
+                if (microphone == null) microphone = GetComponent<VoxtaMicrophone>();
                 var unityPlaybackActive = speechPlayer != null && speechPlayer.IsOutputEnabled && !localServerAudioOutput;
+                var microphoneInputActive = microphone != null && microphone.IsInputEnabled;
                 ReportDiagnostic(DescribeAudioOutput(unityPlaybackActive));
+                ReportDiagnostic(microphoneInputActive ? "Unity microphone streaming is enabled; advertising audioInput: WebSocketStream." : "Unity microphone streaming is disabled or unavailable; advertising audioInput: None.");
                 client = new VoxtaClient(uri, apiKey, new ClientCapabilities
                 {
-                    AudioInput = audioInput,
+                    AudioInput = microphoneInputActive ? AudioInputClientCapabilities.WebSocketStream : AudioInputClientCapabilities.None,
                     AudioOutput = unityPlaybackActive ? AudioOutputClientCapabilities.Url : AudioOutputClientCapabilities.None,
                     VisionCapture = visionCapture
                 });
@@ -104,6 +134,17 @@ namespace Voxta.Unity
                     speechPlayer.SpeechStarted += HandleSpeechStarted;
                     speechPlayer.SpeechEnded += HandleSpeechEnded;
                     speechPlayer.SpeechInterrupted += HandleSpeechInterrupted;
+                }
+                if (microphoneInputActive)
+                {
+                    microphone.Bind(client, session, uri, apiKey);
+                    microphone.CaptureStarted += HandleCaptureStarted;
+                    microphone.CaptureStopped += HandleCaptureStopped;
+                    microphone.RecognitionStarted += HandleRecognitionStarted;
+                    microphone.RecognitionPartial += HandleRecognitionPartial;
+                    microphone.RecognitionEnded += HandleRecognitionEnded;
+                    microphone.AudioFrameReceived += HandleAudioFrame;
+                    microphone.Error += HandleError;
                 }
                 client.ConnectionStateChanged += HandleConnectionState;
                 client.WelcomeReceived += HandleWelcome;
@@ -159,6 +200,25 @@ namespace Voxta.Unity
         private void HandleSpeechStarted(ServerReplyChunkMessage chunk, VoxtaSpeechPlaybackMetrics metrics) { SpeechStarted?.Invoke(chunk, metrics); onSpeechStart.Invoke(metrics); }
         private void HandleSpeechEnded(Guid messageId) { SpeechEnded?.Invoke(messageId); onSpeechEnd.Invoke(messageId.ToString()); }
         private void HandleSpeechInterrupted(Guid messageId) { SpeechInterrupted?.Invoke(messageId); onSpeechInterrupted.Invoke(messageId.ToString()); }
+        private void HandleCaptureStarted() => ReportDiagnostic("Microphone streaming started.");
+        private void HandleCaptureStopped() => ReportDiagnostic("Microphone streaming stopped.");
+        private void HandleRecognitionStarted(ServerSpeechRecognitionStartMessage _) { RecognitionStarted?.Invoke(); onRecognitionStarted.Invoke(); }
+        private void HandleRecognitionPartial(ServerSpeechRecognitionPartialMessage value) { RecognitionPartialReceived?.Invoke(value); onRecognitionPartial.Invoke(value.Text); }
+        private void HandleRecognitionEnded(ServerSpeechRecognitionEndMessage value)
+        {
+            RecognitionEnded?.Invoke(value);
+            onRecognitionEnded.Invoke(value.Text ?? string.Empty);
+            if (string.IsNullOrWhiteSpace(value.Text)) return;
+
+            try
+            {
+                // The server sends partials for display, then expects this repaired final transcript
+                // to return through the normal chat-message path.
+                session?.SendText(value.Text);
+            }
+            catch (Exception exception) { HandleError(exception); }
+        }
+        private void HandleAudioFrame(ServerAudioFrameMessage value) { AudioFrameReceived?.Invoke(value); onAudioFrame.Invoke(value); }
         private string DescribeAudioOutput(bool unityPlaybackActive)
         {
             if (unityPlaybackActive) return "Unity speech playback is enabled; advertising audioOutput: Url.";

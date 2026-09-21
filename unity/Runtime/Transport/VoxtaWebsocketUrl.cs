@@ -29,5 +29,19 @@ namespace Voxta.Unity.Transport
             };
             return builder.Uri;
         }
+
+        public static Uri ToAudioInputStreamUri(Uri serverUrl, Guid sessionId)
+        {
+            if (sessionId == Guid.Empty)
+                throw new ArgumentException("A chat session ID is required.", nameof(sessionId));
+
+            var hub = ToHubUri(serverUrl);
+            var builder = new UriBuilder(hub)
+            {
+                Path = hub.AbsolutePath.Substring(0, hub.AbsolutePath.Length - "/hub".Length) + "/ws/audio/input/stream",
+                Query = "sessionId=" + Uri.EscapeDataString(sessionId.ToString())
+            };
+            return builder.Uri;
+        }
     }
 }

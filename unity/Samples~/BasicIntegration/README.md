@@ -13,8 +13,14 @@ The companion includes `VoxtaSpeechPlayer` and an `AudioSource`. With **Local Se
 Audio Output** disabled, it advertises `audioOutput: Url`, downloads reply audio, and
 plays it through that source. On a local server, also configure **Audio Output** to use
 the client capability; a server setting that prefers its own Audio Output service
-overrides `audioOutput: Url` and plays sound outside Unity. No microphone or device
-flow is included.
+overrides `audioOutput: Url` and plays sound outside Unity.
+
+The sample also includes an enabled `VoxtaMicrophone`. When a local microphone is
+available, the companion advertises `audioInput: WebSocketStream`; the server opens
+capture with a `recordingRequest`, and the sample diagnostics show recognition and
+audio-frame (VAD) events. Configure the local server to use the client audio-input
+capability and an STT service. Disable or remove `VoxtaMicrophone` to advertise
+`audioInput: None`.
 
 Samples already imported into `Assets/Samples/` are copies. Re-import the sample,
 or add an enabled `VoxtaSpeechPlayer` alongside the `AudioSource` on your existing

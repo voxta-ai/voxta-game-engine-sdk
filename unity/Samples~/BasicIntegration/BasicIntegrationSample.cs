@@ -22,6 +22,14 @@ namespace Voxta.Unity.Samples.BasicIntegration
                 + "), " + metrics.DurationSeconds.ToString("F3") + "s");
             companion.SpeechEnded += messageId => AddDiagnostic("Speech completed: " + messageId);
             companion.SpeechInterrupted += messageId => AddDiagnostic("Speech interrupted: " + messageId);
+            companion.RecognitionStarted += () => AddDiagnostic("Speech recognition started.");
+            companion.RecognitionPartialReceived += value => AddDiagnostic("Speech partial: " + value.Text);
+            companion.RecognitionEnded += value =>
+            {
+                AddDiagnostic("Speech recognition ended: " + (value.Text ?? "(empty)") + " (" + value.Reason + ")");
+                if (!string.IsNullOrWhiteSpace(value.Text)) transcript += "You: " + value.Text + "\nVoxta: ";
+            };
+            companion.AudioFrameReceived += value => AddDiagnostic("Microphone: RMS " + value.Rms.ToString("F4") + ", voice=" + value.VoiceActivity + ", listening=" + value.Listening);
             companion.ConnectionStateChanged += value => { status = value.ToString(); AddDiagnostic("Connection state: " + value); };
             companion.Error += exception => { status = exception.Message; AddDiagnostic("ERROR: " + exception); };
             companion.Diagnostic += AddDiagnostic;
@@ -31,7 +39,7 @@ namespace Voxta.Unity.Samples.BasicIntegration
         {
             GUILayout.BeginArea(new Rect(20, 20, 700, 700));
             GUILayout.Label("Voxta Basic Chat — " + status);
-            GUILayout.TextArea(transcript, GUILayout.Height(360));
+            GUILayout.TextArea(transcript, GUILayout.Height(300));
             input = GUILayout.TextField(input);
             if (GUILayout.Button("Send")) Send();
             GUILayout.Label("Diagnostics");

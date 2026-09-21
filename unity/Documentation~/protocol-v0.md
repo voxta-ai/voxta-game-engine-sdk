@@ -88,7 +88,52 @@ prefers. M1 uses the following generated defaults:
 The Unity speech player declares `audioOutput: Url` only while an enabled
 `VoxtaSpeechPlayer` is attached to the companion. Its explicit
 `localServerAudioOutput` setting declares `None` and disables Unity-side
-playback. M3 does not implement `audioInput: WebSocketStream`.
+playback. An enabled `VoxtaMicrophone` with an available local input device
+declares `audioInput: WebSocketStream`; otherwise the companion declares
+`None`. This capability reflects a configured local capture path, rather than
+an intention to capture audio later.
+
+### Audio-input streaming
+
+When `audioInput` is `WebSocketStream`, the server controls capture with hub
+`recordingRequest { sessionId, enabled }` messages. Unity opens or closes the
+microphone and its raw audio socket for that chat session; it does not capture
+continuously before the request.
+
+The stream endpoint is a separate authorized WebSocket, resolved from the
+server base URL as `/ws/audio/input/stream?sessionId={sessionId}`. It uses the
+same bearer API key in its `Authorization` header. Its first frame is a UTF-8
+JSON startup object; later audio frames are WebSocket binary messages and
+controls are WebSocket text messages:
+
+```json
+{
+  "contentType": "audio/wav",
+  "sampleRate": 16000,
+  "channels": 1,
+  "bitsPerSample": 16,
+  "bufferMilliseconds": 30
+}
+```
+
+Unity obtains the actual sample rate and channel count from the microphone clip
+and reports them in this frame. It converts Unity float samples to signed,
+little-endian PCM16 and sends raw PCM bytes, without a WAV header. The server
+also accepts WAV frames, but strips their header before forwarding audio to its
+pipeline. The Unity client replaces sustained low-RMS frames with
+`{"type":"silence","milliseconds":30}`; the server reconstructs those
+markers as PCM silence, preserving stream timing. The client retains real
+frames for 200 ms after audible input so a short quiet gap does not punch a
+hole in an utterance.
+
+The hub can emit `speechRecognitionStart`, `speechRecognitionPartial`,
+`speechRecognitionEnd`, and `audioFrame`. Recognition and VAD/audio-frame
+callbacks are delivered on Unity's main thread. Partials are display updates;
+a nonempty final `speechRecognitionEnd.text` is sent back through the normal
+`send { sessionId, text, role: User }` path. This sends one repaired final
+transcript per utterance rather than every partial revision. `audioFrame`
+contains RMS, voice activity, listening state, and optional noise-floor,
+threshold, and held-run telemetry.
 
 ### Audio-output selection
 

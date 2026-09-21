@@ -115,10 +115,10 @@ HTTP decoder. The current local-server debugging established these contract fact
   advertises and requests `audio/x-wav`, and decodes the response as
   `AudioType.WAV`.
 
-- [ ] Implement `VoxtaMicrophone` capture, PCM16 conversion, and audio-stream WebSocket startup frame.
-- [ ] Stream microphone audio and silence markers to `/ws/audio/input/stream`.
-- [ ] Surface speech-recognition and VAD/audio-frame events.
-- [ ] Test speech playback, interruption, and microphone streaming with a live server.
+- [x] Implement `VoxtaMicrophone` capture, PCM16 conversion, and audio-stream WebSocket startup frame.
+- [x] Stream microphone audio and silence markers to `/ws/audio/input/stream`.
+- [x] Surface speech-recognition and VAD/audio-frame events.
+- [x] Test speech playback, interruption, and microphone streaming with a live server.
 
 ## M4 — Actions, companion API, and device auth
 
@@ -163,4 +163,5 @@ HTTP decoder. The current local-server debugging established these contract fact
 | 2026-09-20 | M3 speech playback implementation | `Runtime/VoxtaSpeechPlayer.cs`, generated M3 protocol subset, and BasicIntegration sample | Implemented the Unity playback state machine, capability selection, lifecycle events, WAV deferred-URL decoding, and sample audio components. Unity compilation passed before the final live-server decoder/routing fixes; live playback and interruption verification remains in progress. |
 | 2026-09-20 | M3 automated playback lifecycle tests | Unity Test Runner, `voxtaSDK-sandbox` | All 27 runtime tests passed after adding `replyStart`, interrupted-completion, and player/server interruption cases. |
 | 2026-09-20 | M3 live Unity playback and interruption | Unity 2022.3 Play mode, local Voxta server and Voxta Talk | Unity downloaded and played reply audio through its `AudioSource`; natural completion and received `audioGapMs` behavior were observed. A playback-start diagnostic reported a decoded duration of `2.339s`. Text interruption and Voxta Talk interruption of the same chat both stopped Unity immediately, sent one completion, and allowed the chat to continue. |
+| 2026-09-20 | M3 live Unity microphone input | Unity 2022.3 Play mode, local Voxta server | `VoxtaMicrophone` captured PCM16 microphone frames, streamed them through the authorized audio-input WebSocket, received recognition and VAD/audio-frame messages, and committed the final recognized transcript through the normal chat `send` path. |
 | | | | |

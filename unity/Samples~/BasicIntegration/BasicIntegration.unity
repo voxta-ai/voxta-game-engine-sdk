@@ -37,6 +37,7 @@ GameObject:
   - component: {fileID: 1004}
   - component: {fileID: 1005}
   - component: {fileID: 1006}
+  - component: {fileID: 1007}
   m_Layer: 0
   m_Name: Voxta Companion
   m_TagString: Untagged
@@ -74,7 +75,6 @@ MonoBehaviour:
   apiKey: 
   characterId: 
   scenarioId: 
-  audioInput: 0
   localServerAudioOutput: 0
   visionCapture: 0
   onConnectionStateChanged:
@@ -99,6 +99,18 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onSpeechInterrupted:
+    m_PersistentCalls:
+      m_Calls: []
+  onRecognitionStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  onRecognitionPartial:
+    m_PersistentCalls:
+      m_Calls: []
+  onRecognitionEnded:
+    m_PersistentCalls:
+      m_Calls: []
+  onAudioFrame:
     m_PersistentCalls:
       m_Calls: []
   onError:
@@ -165,3 +177,21 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000}
   m_Enabled: 1
+--- !u!114 &1007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a91d4101b6a14a7eab722d30a4528ca1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  deviceName:
+  requestedSampleRate: 16000
+  frameMilliseconds: 30
+  substituteSilence: 1
+  silenceRmsFloor: 0.00036621094
+  silenceHangoverMilliseconds: 200

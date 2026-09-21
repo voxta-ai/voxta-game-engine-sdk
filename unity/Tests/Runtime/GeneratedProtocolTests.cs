@@ -78,12 +78,29 @@ namespace Voxta.Unity.Tests
         [TestCase("speechPlaybackStart", typeof(ServerSpeechPlaybackStartMessage))]
         [TestCase("speechPlaybackComplete", typeof(ServerSpeechPlaybackCompleteMessage))]
         [TestCase("interruptSpeech", typeof(ServerInterruptSpeechMessage))]
+        [TestCase("recordingRequest", typeof(ServerRecordingRequestMessage))]
+        [TestCase("speechRecognitionStart", typeof(ServerSpeechRecognitionStartMessage))]
+        [TestCase("speechRecognitionPartial", typeof(ServerSpeechRecognitionPartialMessage))]
+        [TestCase("speechRecognitionEnd", typeof(ServerSpeechRecognitionEndMessage))]
+        [TestCase("audioFrame", typeof(ServerAudioFrameMessage))]
         public void ServerMessageReadsPinnedDiscriminator(string discriminator, Type expectedType)
         {
             var json = "{\"$type\":\"" + discriminator + "\",\"sessionId\":\"00000000-0000-0000-0000-000000000000\"}";
             var message = JsonSerializer.Deserialize<ServerMessage>(json, VoxtaJson.CreateOptions());
 
             Assert.That(message, Is.TypeOf(expectedType));
+        }
+
+        [Test]
+        public void AudioFrameAndRecognitionFieldsReadFromPinnedContracts()
+        {
+            var audio = JsonSerializer.Deserialize<ServerMessage>("{\"$type\":\"audioFrame\",\"rms\":0.25,\"voiceActivity\":true,\"listening\":true,\"noiseFloorRms\":0.1,\"thresholdRms\":0.2,\"runHeldOpen\":false}", VoxtaJson.CreateOptions()) as ServerAudioFrameMessage;
+            var end = JsonSerializer.Deserialize<ServerMessage>("{\"$type\":\"speechRecognitionEnd\",\"text\":\"hello\",\"reason\":\"EndOfSpeech\",\"words\":[{\"text\":\"hello\",\"confidence\":0.9}]}", VoxtaJson.CreateOptions()) as ServerSpeechRecognitionEndMessage;
+
+            Assert.That(audio.VoiceActivity, Is.True);
+            Assert.That(audio.ThresholdRms, Is.EqualTo(0.2f));
+            Assert.That(end.Text, Is.EqualTo("hello"));
+            Assert.That(end.Words[0].Confidence, Is.EqualTo(0.9d));
         }
     }
 }

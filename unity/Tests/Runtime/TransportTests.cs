@@ -23,5 +23,13 @@ namespace Voxta.Unity.Tests
             UnityMainThreadDispatcher.DrainPending();
             Assert.That(called, Is.True);
         }
+
+        [Test]
+        public void AudioInputUrlUsesTheRawStreamEndpointAndSessionQuery()
+        {
+            var sessionId = Guid.Parse("11111111-2222-3333-4444-555555555555");
+            var result = VoxtaWebsocketUrl.ToAudioInputStreamUri(new Uri("https://example.test/base/"), sessionId);
+            Assert.That(result.AbsoluteUri, Is.EqualTo("wss://example.test/base/ws/audio/input/stream?sessionId=11111111-2222-3333-4444-555555555555"));
+        }
     }
 }
