@@ -269,10 +269,18 @@ Resolve REST paths against the server base URL. Send bearer API keys as
 | `POST /api/device/code` | none | `{ "client_id", "scope": "role:app", "label"? }` to `{ "user_code", "verification_url", "device_code" }` |
 | `POST /api/device/poll` | none | `{ "device_code" }`; `204` while pending, then `{ "token": "<API key>" }`; expired/invalid is `400` |
 | `POST /api/device/verify` | approving user's browser session | `{ "user_code" }`; mints the key. It is not a game request. |
-| `POST /api/auth/test` | bearer token being tested | Optional stored-token validation used by the reference client. |
+| `POST /api/auth/test` | bearer token being tested | Returns a success status for a usable app-or-higher token; the Unity auth runtime uses its status only and clears a rejected stored token. |
 
-The reference client polls once per second. The resulting application-scoped
-API key becomes the bearer value for both REST and SignalR.
+The reference client polls once per second, with the first poll after one
+second, and cancellation stops both the wait and request. The Unity runtime
+uses the same timing, validates a received token through `POST /api/auth/test`,
+and persists it only after validation. The resulting application-scoped API
+key becomes the bearer value for both REST and SignalR.
+
+This sequence was exercised in Unity 2022.3 Play Mode against the pinned local
+server: the user opened the returned verification URL, entered the returned
+user code, approved the request, and Unity completed polling, validation, and
+`PlayerPrefs` persistence.
 
 For M3, fetch a non-empty `replyChunk.audioUrl` with `GET`, resolving relative
 URLs against the server URL and sending `Accept: audio/x-wav`. Deferred URLs

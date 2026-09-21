@@ -122,8 +122,8 @@ HTTP decoder. The current local-server debugging established these contract fact
 
 ## M4 — Actions, companion API, and device auth
 
-- [ ] Implement `VoxtaAuth` device-code request, polling, cancellation, token validation, and token-store abstraction.
-- [ ] Provide a PlayerPrefs token-store implementation.
+- [x] Implement `VoxtaAuth` device-code request, polling, cancellation, token validation, and token-store abstraction.
+- [x] Provide a PlayerPrefs token-store implementation.
 - [ ] Implement `VoxtaActions` registration and `ClientUpdateContextMessage` publication.
 - [ ] Dispatch `ServerActionMessage` to C# handlers and UnityEvents.
 - [ ] Implement `ClientTriggerActionMessage` and scenario context updates.
@@ -165,4 +165,5 @@ HTTP decoder. The current local-server debugging established these contract fact
 | 2026-09-20 | M3 automated microphone and protocol tests | Unity Play Mode Test Runner, `voxtaSDK-sandbox` | All 37 Play Mode tests passed with 0 failures, including PCM16 conversion, audio-input URL construction, generated recognition/VAD contracts, and final transcript chat-send coverage. There are no current Edit Mode tests. |
 | 2026-09-20 | M3 live Unity playback and interruption | Unity 2022.3 Play mode, local Voxta server and Voxta Talk | Unity downloaded and played reply audio through its `AudioSource`; natural completion and received `audioGapMs` behavior were observed. A playback-start diagnostic reported a decoded duration of `2.339s`. Text interruption and Voxta Talk interruption of the same chat both stopped Unity immediately, sent one completion, and allowed the chat to continue. |
 | 2026-09-20 | M3 live Unity microphone input | Unity 2022.3 Play mode, local Voxta server | `VoxtaMicrophone` captured PCM16 microphone frames, streamed them through the authorized audio-input WebSocket, received recognition and VAD/audio-frame messages, and committed the final recognized transcript through the normal chat `send` path. |
+| 2026-09-20 | M4 device authorization | `VoxtaAuthTests` (5/5 Play Mode), fresh Unity 2022.3 package compilation, local server REST probes, and Unity Play Mode device approval | Verified the pinned `code` (200), pending `poll` (204), and bearer token-validation (200) contracts. A user approved a Play Mode request at the returned verification URL; Unity then polled, validated, and saved the granted API key through `PlayerPrefsTokenStore`. |
 | | | | |
