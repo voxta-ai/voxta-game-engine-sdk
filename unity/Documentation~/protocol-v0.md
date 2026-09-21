@@ -282,6 +282,39 @@ server: the user opened the returned verification URL, entered the returned
 user code, approved the request, and Unity completed polling, validation, and
 `PlayerPrefs` persistence.
 
+## M4 action registration and context publication
+
+Actions are registered over the authenticated `/hub` SignalR connection; the
+pinned server has no separate action-registration REST endpoint. After the
+server sends `chatStarted`, the client publishes an `updateContext` message:
+
+```json
+{
+  "$type": "updateContext",
+  "sessionId": "<chat session GUID>",
+  "contextKey": "Unity",
+  "actions": [{
+    "name": "wave",
+    "description": "Wave at the player.",
+    "arguments": [{ "name": "hand", "type": 1, "required": true }]
+  }]
+}
+```
+
+`actions` replaces the complete action set for its `contextKey`; sending an
+empty array clears the client's registered actions for that key. The server
+uses `"Main"` when `contextKey` is omitted, but the Unity `VoxtaActions`
+component requires an explicit non-empty key and defaults it to `"Unity"` to
+avoid replacing scenario-owned actions. The verified definition fields used by
+this unit are `name`, `description`, and argument `name`, `type`,
+`description`, `required`, `itemsType`, and `choices`. `FunctionArgumentType`
+is numeric on the wire (`String` is `1`).
+
+The server queues `updateContext` as a chat input and imports the supplied
+actions at chat priority for that key. It does not acknowledge publication.
+`ServerActionMessage` uses discriminator `action`, but receiving or dispatching
+it is intentionally outside this unit and remains unimplemented.
+
 For M3, fetch a non-empty `replyChunk.audioUrl` with `GET`, resolving relative
 URLs against the server URL and sending `Accept: audio/x-wav`. Deferred URLs
 do not have a filename extension, so Unity creates its `DownloadHandlerAudioClip`

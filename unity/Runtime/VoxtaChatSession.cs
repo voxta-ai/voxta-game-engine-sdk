@@ -31,6 +31,14 @@ namespace Voxta.Unity
             client.Send(new ClientSendMessage { SessionId = SessionId, Text = text });
         }
 
+        internal void SendContextUpdate(ClientUpdateContextMessage message)
+        {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+            if (SessionId == Guid.Empty) throw new InvalidOperationException("The chat session has not started.");
+            if (message.SessionId != SessionId) throw new ArgumentException("The context update belongs to another chat session.", nameof(message));
+            client.Send(message);
+        }
+
         public void Dispose() => client.MessageReceived -= HandleMessage;
 
         private void HandleMessage(ServerMessage message)

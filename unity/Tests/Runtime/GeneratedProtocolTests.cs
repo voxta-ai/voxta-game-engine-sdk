@@ -69,6 +69,30 @@ namespace Voxta.Unity.Tests
             StringAssert.Contains("\"$type\":\"interrupt\"", interrupt);
         }
 
+        [Test]
+        public void UpdateContextWritesPinnedActionRegistrationContract()
+        {
+            var json = JsonSerializer.Serialize<ClientMessage>(new ClientUpdateContextMessage
+            {
+                SessionId = Guid.NewGuid(),
+                ContextKey = "Unity",
+                Actions = new[]
+                {
+                    new ScenarioActionDefinition
+                    {
+                        Name = "wave",
+                        Description = "Wave at the player.",
+                        Arguments = new[] { new FunctionArgumentDefinition { Name = "hand", Type = FunctionArgumentType.String, Required = true } }
+                    }
+                }
+            }, VoxtaJson.CreateOptions());
+
+            StringAssert.Contains("\"$type\":\"updateContext\"", json);
+            StringAssert.Contains("\"contextKey\":\"Unity\"", json);
+            StringAssert.Contains("\"name\":\"wave\"", json);
+            StringAssert.Contains("\"required\":true", json);
+        }
+
         [TestCase("welcome", typeof(ServerWelcomeMessage))]
         [TestCase("authenticationRequired", typeof(ServerAuthenticationRequiredMessage))]
         [TestCase("chatStarted", typeof(ServerChatStartedMessage))]

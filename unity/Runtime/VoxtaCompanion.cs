@@ -51,6 +51,7 @@ namespace Voxta.Unity
         private VoxtaChatSession session;
         private VoxtaSpeechPlayer speechPlayer;
         private VoxtaMicrophone microphone;
+        private VoxtaActions actions;
 
         public event Action<VoxtaConnectionState> ConnectionStateChanged;
         public event Action<ServerWelcomeMessage> WelcomeReceived;
@@ -71,11 +72,13 @@ namespace Voxta.Unity
         public VoxtaChatSession ChatSession => session;
         public VoxtaSpeechPlayer SpeechPlayer => speechPlayer;
         public VoxtaMicrophone Microphone => microphone;
+        public VoxtaActions Actions => actions;
 
         private void Awake()
         {
             speechPlayer = GetComponent<VoxtaSpeechPlayer>();
             microphone = GetComponent<VoxtaMicrophone>();
+            actions = GetComponent<VoxtaActions>();
         }
 
         private void OnEnable()
@@ -104,6 +107,7 @@ namespace Voxta.Unity
                 microphone.Error -= HandleError;
                 microphone.Unbind();
             }
+            if (actions != null) actions.Unbind();
             if (session != null) { session.Dispose(); session = null; }
             if (client != null) { await client.DisposeAsync(); client = null; }
         }
@@ -117,6 +121,7 @@ namespace Voxta.Unity
                 ReportDiagnostic("Opening SignalR connection to " + Transport.VoxtaWebsocketUrl.ToHubUri(uri));
                 if (speechPlayer == null) speechPlayer = GetComponent<VoxtaSpeechPlayer>();
                 if (microphone == null) microphone = GetComponent<VoxtaMicrophone>();
+                if (actions == null) actions = GetComponent<VoxtaActions>();
                 var unityPlaybackActive = speechPlayer != null && speechPlayer.IsOutputEnabled && !localServerAudioOutput;
                 var microphoneInputActive = microphone != null && microphone.IsInputEnabled;
                 ReportDiagnostic(DescribeAudioOutput(unityPlaybackActive));
@@ -128,6 +133,7 @@ namespace Voxta.Unity
                     VisionCapture = visionCapture
                 });
                 session = new VoxtaChatSession(client);
+                if (actions != null) actions.Bind(session);
                 if (unityPlaybackActive)
                 {
                     speechPlayer.Bind(client, session, uri);

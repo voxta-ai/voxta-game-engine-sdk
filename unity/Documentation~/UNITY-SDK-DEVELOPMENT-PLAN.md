@@ -124,7 +124,7 @@ HTTP decoder. The current local-server debugging established these contract fact
 
 - [x] Implement `VoxtaAuth` device-code request, polling, cancellation, token validation, and token-store abstraction.
 - [x] Provide a PlayerPrefs token-store implementation.
-- [ ] Implement `VoxtaActions` registration and `ClientUpdateContextMessage` publication.
+- [x] Implement `VoxtaActions` registration and `ClientUpdateContextMessage` publication.
 - [ ] Dispatch `ServerActionMessage` to C# handlers and UnityEvents.
 - [ ] Implement `ClientTriggerActionMessage` and scenario context updates.
 - [ ] Implement app-trigger dispatch and `ClientAppTriggerCompleteMessage` acknowledgement.
@@ -166,4 +166,5 @@ HTTP decoder. The current local-server debugging established these contract fact
 | 2026-09-20 | M3 live Unity playback and interruption | Unity 2022.3 Play mode, local Voxta server and Voxta Talk | Unity downloaded and played reply audio through its `AudioSource`; natural completion and received `audioGapMs` behavior were observed. A playback-start diagnostic reported a decoded duration of `2.339s`. Text interruption and Voxta Talk interruption of the same chat both stopped Unity immediately, sent one completion, and allowed the chat to continue. |
 | 2026-09-20 | M3 live Unity microphone input | Unity 2022.3 Play mode, local Voxta server | `VoxtaMicrophone` captured PCM16 microphone frames, streamed them through the authorized audio-input WebSocket, received recognition and VAD/audio-frame messages, and committed the final recognized transcript through the normal chat `send` path. |
 | 2026-09-20 | M4 device authorization | `VoxtaAuthTests` (5/5 Play Mode), fresh Unity 2022.3 package compilation, local server REST probes, and Unity Play Mode device approval | Verified the pinned `code` (200), pending `poll` (204), and bearer token-validation (200) contracts. A user approved a Play Mode request at the returned verification URL; Unity then polled, validated, and saved the granted API key through `PlayerPrefsTokenStore`. |
+| 2026-09-20 | M4 action registration and context publication | `VoxtaActionsTests` and `GeneratedProtocolTests` (23/23 Play Mode), plus explicit local-server action-registration test (1/1) | Generated the pinned `updateContext` and action-definition subset. `VoxtaActions` publishes its declarative registrations after `chatStarted`; the live test reused the saved device-flow token, started the configured local chat, published the registration, and remained connected. |
 | | | | |
