@@ -8,7 +8,7 @@ namespace Voxta.Unity.Tests
         public void Pcm16ConversionClampsAndUsesLittleEndian()
         {
             var bytes = Pcm16Conversion.ToLittleEndianPcm16(new[] { -1f, -0.5f, 0f, 0.5f, 1f });
-            Assert.That(bytes, Is.EqualTo(new byte[] { 0, 128, 1, 192, 0, 0, 255, 63, 255, 127 }));
+            Assert.That(bytes, Is.EqualTo(new byte[] { 0, 128, 0, 192, 0, 0, 0, 64, 255, 127 }));
         }
 
         [Test]

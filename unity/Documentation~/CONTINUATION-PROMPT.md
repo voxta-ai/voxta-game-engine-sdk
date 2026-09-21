@@ -1,24 +1,19 @@
-# Continuation Prompt: Implement M3 microphone input
+# Continuation Prompt: Implement M4 device authorization
 
 Continue in `G:\voxta-projects\GitHub\voxta-game-engine-sdk\unity`. M1, M2,
-and the M3 speech-playback unit are complete; M1 generator-drift CI remains
-intentionally unchecked. Preserve all existing changes.
+and M3 are complete: Unity speech playback and microphone streaming were
+verified in Play Mode, and all 37 Play Mode tests pass. M1 generator-drift CI
+remains intentionally unchecked. Preserve all existing changes.
 
-Implement only the remaining M3 microphone work. Before editing, read the
-development plan, `protocol-v0.md`, current session/transport code, and the
-pinned server's audio-input WebSocket endpoint, startup-frame DTO, audio-input
-capabilities, speech-recognition messages, and VAD/audio-frame messages.
+Implement only the first M4 unit: `VoxtaAuth` device-code request, polling,
+cancellation, token validation, and a token-store abstraction with a
+`PlayerPrefs` implementation. Before editing, read the development plan,
+`protocol-v0.md`, current client/session code, and the pinned server's device
+authorization REST contracts and canonical client behavior.
 
-Add `VoxtaMicrophone` for Unity 2022.3/.NET Standard 2.1: microphone capture,
-PCM16 conversion, audio-input WebSocket startup frame, audio and silence-marker
-streaming to `/ws/audio/input/stream`, and main-thread public callbacks/events
-for recognition, VAD, and audio frames. Advertise `audioInput: WebSocketStream`
-only while the path is active and configured. Integrate it with
-`VoxtaCompanion` and the BasicIntegration sample without regressing the verified
-Unity speech playback path.
-
-Expand the generated protocol subset only for verified contracts. Add focused
-automated tests where practical, then perform a live local-server Play-mode
-microphone run. Update `protocol-v0.md` with verified discoveries and check M3
-microphone items only after that evidence. Do not begin device auth, actions,
-M4, package .NET 10 server assemblies, or add CI. Use `apply_patch` for edits.
+Keep the Unity runtime on 2022.3/.NET Standard 2.1, use generated protocol
+types only for verified contracts, keep public Unity callbacks on the main
+thread, add focused tests, and verify the flow against the local server. Record
+verified discoveries in `protocol-v0.md` and check only the completed M4
+device-auth items after evidence. Do not begin actions, companion prefab work,
+M5, package .NET 10 server assemblies, or CI. Use `apply_patch` for edits.
