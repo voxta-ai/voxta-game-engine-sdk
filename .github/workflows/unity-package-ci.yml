@@ -72,6 +72,10 @@ jobs:
       UNITY_IMAGE: unityci/editor:ubuntu-2022.3.62f3-windows-il2cpp-3
       VALIDATION_PROJECT: .ci/UnityPackageValidation
       PACKAGE_GIT_URL: ${{ github.event.pull_request.head.repo.clone_url || format('https://github.com/{0}.git', github.repository) }}
+      # Defined once here, inherited by all Game-CI steps below
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
     steps:
       - uses: actions/checkout@v4.2.2
         with:
@@ -84,14 +88,8 @@ jobs:
           ./Tools/CI/Initialize-UnityPackageValidationProject.ps1 -ProjectPath $env:VALIDATION_PROJECT -Revision $revision -PackageGitUrl $env:PACKAGE_GIT_URL
 
       - name: Resolve the package and import Basic Chat Integration
-        uses: game-ci/unity-builder@v4.3.1
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        uses: game-ci/unity-builder@v4
         with:
-          unityVersion: ${{ env.UNITY_VERSION }}
           customImage: ${{ env.UNITY_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
           targetPlatform: StandaloneWindows64
@@ -100,27 +98,15 @@ jobs:
 
       - name: Run package Edit and Play Mode tests
         uses: game-ci/unity-test-runner@v4.3.1
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         with:
-          unityVersion: ${{ env.UNITY_VERSION }}
           customImage: ${{ env.UNITY_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
           testMode: all
           artifactsPath: artifacts/test-results
 
       - name: Build Basic Chat Integration for Windows Mono
-        uses: game-ci/unity-builder@v4.3.1
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        uses: game-ci/unity-builder@v4
         with:
-          unityVersion: ${{ env.UNITY_VERSION }}
           customImage: ${{ env.UNITY_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
           targetPlatform: StandaloneWindows64
@@ -128,14 +114,8 @@ jobs:
           allowDirtyBuild: true
 
       - name: Build Basic Chat Integration for Windows IL2CPP
-        uses: game-ci/unity-builder@v4.3.1
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        uses: game-ci/unity-builder@v4
         with:
-          unityVersion: ${{ env.UNITY_VERSION }}
           customImage: ${{ env.UNITY_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
           targetPlatform: StandaloneWindows64
