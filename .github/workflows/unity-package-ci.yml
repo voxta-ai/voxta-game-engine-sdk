@@ -38,11 +38,19 @@ jobs:
         with:
           dotnet-version: 10.0.401
 
-      - name: Fetch the latest Voxta model
+      - name: Check out the latest Voxta model
+        uses: actions/checkout@v4.2.2
+        with:
+          repository: voxta-ai/voxta-server
+          token: ${{ secrets.VOXTA_SERVER_READ_TOKEN }}
+          path: .ci/voxta-server
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Build the latest Voxta model
         shell: bash
         run: |
           set -euo pipefail
-          git clone --depth 1 https://github.com/voxta-ai/voxta-server.git .ci/voxta-server
           git -C .ci/voxta-server log -1 --format='Testing Voxta.Model commit %H'
           dotnet build .ci/voxta-server/src/common/Voxta.Model/Voxta.Model.csproj --configuration Release
 
