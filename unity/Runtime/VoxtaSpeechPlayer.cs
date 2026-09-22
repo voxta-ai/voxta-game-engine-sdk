@@ -28,6 +28,7 @@ namespace Voxta.Unity
         private VoxtaClient client;
         private VoxtaChatSession session;
         private Uri serverUri;
+        private string accessToken;
         private AudioClip playingClip;
         private float lastPlaybackEnd;
 
@@ -43,12 +44,13 @@ namespace Voxta.Unity
         /// <summary>Whether this component is configured to accept URL playback during companion initialization.</summary>
         public bool IsOutputEnabled => enabled && gameObject.activeInHierarchy && audioSource != null && audioSource.enabled;
 
-        internal void Bind(VoxtaClient value, VoxtaChatSession chatSession, Uri baseUri)
+        internal void Bind(VoxtaClient value, VoxtaChatSession chatSession, Uri baseUri, string token)
         {
             Unbind();
             client = value ?? throw new ArgumentNullException(nameof(value));
             session = chatSession ?? throw new ArgumentNullException(nameof(chatSession));
             serverUri = baseUri ?? throw new ArgumentNullException(nameof(baseUri));
+            accessToken = token ?? string.Empty;
             session.ReplyChunk += HandleReplyChunk;
             session.ReplyCompleted += HandleReplyEnd;
             client.MessageReceived += HandleServerMessage;
@@ -66,6 +68,7 @@ namespace Voxta.Unity
             client = null;
             session = null;
             serverUri = null;
+            accessToken = null;
         }
 
         /// <summary>Stops local speech and asks the server to interrupt the active reply.</summary>
@@ -136,9 +139,8 @@ namespace Voxta.Unity
                 yield break;
             }
 
-            using (var request = UnityWebRequestMultimedia.GetAudioClip(audioUri.AbsoluteUri, AudioType.WAV))
+            using (var request = CreateAudioRequest(audioUri))
             {
-                request.SetRequestHeader("Accept", "audio/x-wav");
                 yield return request.SendWebRequest();
                 if (!reply.Cancelled && request.result == UnityWebRequest.Result.Success)
                     item.Clip = DownloadHandlerAudioClip.GetContent(request);
@@ -146,6 +148,14 @@ namespace Voxta.Unity
                     item.Error = new InvalidOperationException("Unable to download reply audio: " + request.error);
             }
             item.Ready = true;
+        }
+
+        private UnityWebRequest CreateAudioRequest(Uri audioUri)
+        {
+            var request = UnityWebRequestMultimedia.GetAudioClip(audioUri.AbsoluteUri, AudioType.WAV);
+            request.SetRequestHeader("Accept", "audio/x-wav");
+            if (!string.IsNullOrWhiteSpace(accessToken)) request.SetRequestHeader("Authorization", "Bearer " + accessToken);
+            return request;
         }
 
         private IEnumerator ProcessReply(ReplyState reply)

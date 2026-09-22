@@ -247,17 +247,30 @@ sequenceDiagram
 
 SignalR JSON uses camel-case names and a top-level `$type` discriminator. It
 names a wire message type, not a CLR type. The M1 client sends only
-`authenticate`, `startChat`, and `send`. It receives only `welcome`,
-`authenticationRequired`, `error`, `chatStarting`, `chatStarted`, `replyChunk`,
-and `replyEnd`.
+`authenticate`, `startChat`, and `send`; the current M3/M4 implementation also
+sends `interrupt`, `speechPlaybackStart`, `speechPlaybackComplete`,
+`updateContext`, and `triggerAction`. Client message DTOs are send-only:
+attempting to deserialize a `ClientMessage`, or serialize any other client
+root, raises `JsonException`.
 
-The generated converter raises `JsonException` for a missing or unknown
-`$type`, or an unsupported client root. A receive-side deserialization failure
-prevents message delivery and is a protocol fault; it must not be treated as an
-ignored optional event. An engine must read `$type` before materializing the
-concrete DTO. New server types require generated DTOs, discriminator
-registration, and explicit runtime handling; parsing known fields does not
-override the exact `apiVersion` compatibility check.
+The receive subset is `welcome`, `authenticationRequired`, `error`,
+`chatStarting`, `chatStarted`, `replyStart`, `replyChunk`, `replyEnd`,
+`speechPlaybackStart`, `speechPlaybackComplete`, `interruptSpeech`, `action`,
+`appTrigger`, `contextUpdated`, `animationPlay`, `chatSessionError`,
+`recordingRequest`, `speechRecognitionStart`, `speechRecognitionPartial`,
+`speechRecognitionEnd`, and `audioFrame`. Server message DTOs are receive-only.
+`ChatMessageRole` accepts either its numeric wire value or an enum name on
+receive; Unity writes its numeric value.
+
+The transport receives hub payloads as raw JSON and uses `$type` to materialize
+only this generated server subset. Frames with a missing or unknown `$type`,
+and malformed non-`action` frames, are ignored so a future frame cannot prevent
+later supported messages from reaching Unity. A malformed `action` frame is
+additionally reported through the client error callback
+because it could otherwise conceal an action-dispatch failure. New supported
+server types require a generated DTO, discriminator registration, and explicit
+runtime handling; known fields do not override the exact `apiVersion`
+compatibility check.
 
 ## Minimal REST surface
 
@@ -312,8 +325,163 @@ is numeric on the wire (`String` is `1`).
 
 The server queues `updateContext` as a chat input and imports the supplied
 actions at chat priority for that key. It does not acknowledge publication.
-`ServerActionMessage` uses discriminator `action`, but receiving or dispatching
-it is intentionally outside this unit and remains unimplemented.
+Its `contexts` field similarly replaces the complete context set for that key.
+Each context has optional `id` and `name`, required `text`, `disabled`,
+optional `flagsFilter` and `roleFilter`, numeric `applyTo`, and numeric
+`position`. `VoxtaActions.SetContexts` publishes these declarative contexts
+together with its action definitions.
+
+A client can directly invoke a registered non-tool action with:
+
+```json
+{
+  "$type": "triggerAction",
+  "sessionId": "<chat session GUID>",
+  "messageId": "<persisted chat message GUID>",
+  "value": "wave",
+  "arguments": [{ "name": "hand", "value": "left" }]
+}
+```
+
+`messageId` must identify an existing message in the active chat, and `value`
+is the action name rather than an action ID. The server resolves matching
+actions in the chat context, rejects direct invocation of tool-calling actions,
+and forwards optional string arguments to the action invocation. Unity exposes
+this as `VoxtaChatSession.TriggerAction`; it validates the active session,
+target message ID, and action name before sending.
+
+The pinned server sends an inferred invocation as `action`. It is chat-scoped
+and carries `sessionId`, optional `contextKey` and `layer`, required action
+`value`, `role`, `senderId`, optional `scenarioRole`, and optional string
+arguments:
+
+```json
+{
+  "$type": "action",
+  "sessionId": "<chat session GUID>",
+  "contextKey": "Unity",
+  "layer": "game",
+  "value": "wave",
+  "role": "Assistant",
+  "senderId": "<sender GUID>",
+  "scenarioRole": "Guide",
+  "arguments": [{ "name": "hand", "value": "left" }]
+}
+```
+
+The server serializes `role` by enum name (for example, `"Assistant"`), not
+as the enum's numeric value. Unity deserializes this exact subset into `ServerActionMessage` and
+`ActionInvocationArgument`. `VoxtaChatSession` forwards an action only when
+its `sessionId` matches the active chat. `VoxtaActions` then accepts only the
+component's exact `contextKey`, dispatches named C# handlers registered with
+`RegisterHandler`, raises its `ActionReceived` event and `OnAction` UnityEvent,
+and invokes the matching definition's UnityEvent. SignalR posts every received
+message to `UnityMainThreadDispatcher`; consequently all of these callbacks
+run on Unity's main thread. Action names and context keys use ordinal matching.
+
+On the pinned server, action inference constructs this `action` message after
+an inferred action's effects run, then sends it through the chat tunnel unless
+an installed chat augmentation reports that it handled the invocation. Thus an
+`Inferred ... action` server log is evidence that the message was constructed,
+but not by itself that it was sent to the Unity connection. The explicit Unity
+test observes both the raw client message and the dispatched handler so it can
+distinguish server-side handling from a Unity session or context-key filter.
+
+The package includes an explicit local-server test which registers
+`unity_m4_dispatch_probe`, waits for the server to import the queued context,
+then asks the character to invoke it with `hand: left`. It requires the
+previous device-flow token and an action-enabled local character; there is no
+separate action-registration or action-invocation endpoint.
+
+The direct-trigger verification uses the local Assistant scenario instead of
+the text-only test character, because that scenario emits a persisted bootstrap
+reply. Unity waits for the bootstrap reply to complete, uses its `messageId` in
+`triggerAction`, and publishes a scenario context and the probe action under
+`"Unity"`. The server accepted the context update without faulting the
+connection and returned the directly triggered `action` to the registered
+`VoxtaActions` handler.
+
+### App triggers
+
+Scenario scripts send application effects as a chat-scoped `appTrigger` frame:
+
+```json
+{
+  "$type": "appTrigger",
+  "sessionId": "<chat session GUID>",
+  "messageId": "<optional source message GUID>",
+  "triggerId": "<optional queued-trigger GUID>",
+  "name": "setMood",
+  "arguments": ["happy", 3, true],
+  "senderId": "<sender GUID>",
+  "scenarioRole": "Guide"
+}
+```
+
+`name` is required; `arguments` is a required nullable array in the pinned
+model and each element can be any JSON value. Unity materializes those values
+as `JsonElement` values so applications retain their wire type. `messageId`,
+`triggerId`, and `scenarioRole` are optional. A normal script trigger has no
+`triggerId` and is fire-and-forget. A queued foreground trigger includes one:
+the server waits for its completion before continuing that foreground command.
+
+`VoxtaChatSession.AppTriggerReceived` delivers only frames for the active
+chat, on Unity's main thread. Once its synchronous subscribers return, Unity
+sends:
+
+```json
+{
+  "$type": "appTriggerComplete",
+  "sessionId": "<chat session GUID>",
+  "triggerId": "<queued-trigger GUID>"
+}
+```
+
+Unity never acknowledges a fire-and-forget trigger or a trigger for another
+session. A subscriber exception prevents the acknowledgement, leaving the
+server's queued operation to its own cancellation path rather than incorrectly
+reporting successful delivery. The server validates the completion session ID;
+within a valid session, an unknown or duplicate trigger ID is a no-op.
+
+The explicit local-server test starts the dedicated queued-trigger scenario,
+waits for server-side scenario initialization after `chatStarted`, then sends a
+probe user message. It verifies Unity receives
+`unity_m4_app_trigger_probe` with string, integer, and Boolean arguments, a
+non-null `triggerId`, and main-thread delivery. The session's automatic
+completion acknowledgement leaves the connection usable.
+
+### Context updates, animation playback, and action errors
+
+The server sends `contextUpdated` whenever live scenario state changes. It is
+chat-scoped and includes required `sessionId`, `flags`, `characters`, and
+`roles`; `flags` entries contain a required name plus optional message and
+expiry chat-time/index metadata. Optional `variables` values are arbitrary JSON
+and remain `JsonElement` values in Unity. The generated subset also preserves
+the optional context, action, tool, button, and control-group lists: contexts
+and actions retain their named, typed entries, while each polymorphic control
+definition remains raw JSON so applications can interpret only the controls
+they support.
+
+`animationPlay` is chat-scoped and carries required `sessionId`, `animationId`,
+`url`, and `contentType`; `fileName` and `label` are optional, while
+`frameCount` and `fps` are numeric playback metadata. It is a delivery
+notification only: the companion API surfaces it but does not download or play
+the animation.
+
+Action/session failures arrive as `chatSessionError`, not the connection-wide
+`error` frame. The required fields are `sessionId` and `message`; `details` is
+optional and `retry` defaults to `true`. Unity exposes all three roots through
+matching `VoxtaChatSession` typed C# events and `VoxtaCompanion` typed C# and
+UnityEvent callbacks. Session filtering drops frames for another chat, and
+SignalR dispatch keeps every callback on Unity's main thread. After its typed
+callback, `chatSessionError` is also reported through the companion's existing
+error callback as `VoxtaChatSessionException`; it does not fault the transport
+or change connection state.
+
+The generated discriminator subset is therefore `contextUpdated`,
+`animationPlay`, and `chatSessionError`. Unknown and malformed frames retain
+the existing resilient behavior: they are ignored unless a malformed `action`
+frame must be reported to avoid concealing action dispatch failure.
 
 For M3, fetch a non-empty `replyChunk.audioUrl` with `GET`, resolving relative
 URLs against the server URL and sending `Accept: audio/x-wav`. Deferred URLs

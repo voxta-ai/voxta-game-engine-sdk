@@ -1,8 +1,16 @@
 # Basic Chat Integration
 
 Import this sample through Package Manager, then open `BasicIntegration.unity`.
-Select the **Voxta Companion** object and enter a local-server API key, character ID,
-and optional scenario ID. Press Play, enter text, and select **Send**.
+Select the **Voxta Companion** object and enter a character ID and optional scenario
+ID. Leave its API Key empty. Its Server URL defaults to the local server at
+`http://127.0.0.1:5384`; change it before Play if your local server uses a different
+HTTP or HTTPS address.
+
+Start the local Voxta server, press Play, then use the displayed verification URL and
+code to approve **Unity Basic Integration**. The sample polls until approval, validates
+the returned token, saves it in PlayerPrefs, and then connects automatically. Later
+runs validate and reuse that saved authorization. Enter text and select **Send** once
+the chat connects.
 
 The imported sample includes the required IL2CPP linker configuration. If you use
 `VoxtaCompanion` outside this sample, copy `link.xml` from this folder into your

@@ -125,15 +125,15 @@ HTTP decoder. The current local-server debugging established these contract fact
 - [x] Implement `VoxtaAuth` device-code request, polling, cancellation, token validation, and token-store abstraction.
 - [x] Provide a PlayerPrefs token-store implementation.
 - [x] Implement `VoxtaActions` registration and `ClientUpdateContextMessage` publication.
-- [ ] Dispatch `ServerActionMessage` to C# handlers and UnityEvents.
-- [ ] Implement `ClientTriggerActionMessage` and scenario context updates.
-- [ ] Implement app-trigger dispatch and `ClientAppTriggerCompleteMessage` acknowledgement.
-- [ ] Surface context updates, animation-play messages, and action errors through the companion API.
-- [ ] Create the reusable `VoxtaCompanion` prefab with client, speech player, microphone, and actions components.
+- [x] Dispatch `ServerActionMessage` to C# handlers and UnityEvents.
+- [x] Implement `ClientTriggerActionMessage` and scenario context updates.
+- [x] Implement app-trigger dispatch and `ClientAppTriggerCompleteMessage` acknowledgement.
+- [x] Surface context updates, animation-play messages, and action errors through the companion API.
+- [x] Create the reusable `VoxtaCompanion` prefab with client, speech player, microphone, and actions components.
 
 ## M5 — Release-quality package and sample
 
-- [ ] Replace temporary API-key setup in the sample with device-flow setup and clear local-server guidance.
+- [x] Replace temporary API-key setup in the sample with device-flow setup and clear local-server guidance.
 - [ ] Expand the sample to demonstrate voice, spatial playback, and a registered game action.
 - [ ] Write quickstart documentation that reaches a talking companion in under 15 minutes.
 - [ ] Test Mono and IL2CPP builds on supported desktop targets.
@@ -167,4 +167,9 @@ HTTP decoder. The current local-server debugging established these contract fact
 | 2026-09-20 | M3 live Unity microphone input | Unity 2022.3 Play mode, local Voxta server | `VoxtaMicrophone` captured PCM16 microphone frames, streamed them through the authorized audio-input WebSocket, received recognition and VAD/audio-frame messages, and committed the final recognized transcript through the normal chat `send` path. |
 | 2026-09-20 | M4 device authorization | `VoxtaAuthTests` (5/5 Play Mode), fresh Unity 2022.3 package compilation, local server REST probes, and Unity Play Mode device approval | Verified the pinned `code` (200), pending `poll` (204), and bearer token-validation (200) contracts. A user approved a Play Mode request at the returned verification URL; Unity then polled, validated, and saved the granted API key through `PlayerPrefsTokenStore`. |
 | 2026-09-20 | M4 action registration and context publication | `VoxtaActionsTests` and `GeneratedProtocolTests` (23/23 Play Mode), plus explicit local-server action-registration test (1/1) | Generated the pinned `updateContext` and action-definition subset. `VoxtaActions` publishes its declarative registrations after `chatStarted`; the live test reused the saved device-flow token, started the configured local chat, published the registration, and remained connected. |
+| 2026-09-21 | M4 action dispatch | Explicit local-server `VoxtaActionsTests.DispatchesAnActionFromTheLocalServer` (1/1 Play Mode) | The server inferred `unity_m4_dispatch_probe(hand: "left")`, serialized and sent an `action` frame, and Unity delivered it to both the raw client callback and registered `VoxtaActions` handler. The verified server payload writes enum `role` values by name (`"Assistant"`), so the generated protocol options include `JsonStringEnumConverter`; SignalR binds raw JSON first so unsupported future frames cannot prevent a later supported action from reaching the dispatcher. |
+| 2026-09-21 | M4 action trigger and scenario contexts | Explicit local-server `VoxtaActionsTests.TriggersARegisteredActionWithScenarioContextOnTheLocalServer` (1/1 Play Mode) | The local Assistant scenario emitted one persisted bootstrap message. Unity waited for that reply to complete, sent the message ID in `triggerAction` after publishing a scenario context and action, remained connected, and received the triggered action through its registered `VoxtaActions` handler. |
+| 2026-09-21 | M4 app-trigger dispatch and acknowledgement | Explicit local-server `VoxtaActionsTests.DispatchesAndAcknowledgesAQueuedAppTriggerOnTheLocalServer` (1/1 Play Mode) | The dedicated scenario emitted `unity_m4_app_trigger_probe` with mixed JSON arguments and a queued `triggerId`. Unity delivered it on the main thread and acknowledged it with `appTriggerComplete` while keeping the chat connection usable. |
+| 2026-09-21 | M4 companion context, animation, and action-error messages | `GeneratedProtocolTests` and `VoxtaActionsTests` Play Mode coverage | Generated `contextUpdated`, `animationPlay`, and `chatSessionError` from the pinned model. Verified their discriminator and field materialization, active-session filtering, main-thread session delivery, and companion typed C# and UnityEvent callbacks. All non-live Play Mode tests pass; four explicit local-server tests remain excluded because they require a running, authorized server. |
+| 2026-09-21 | M5 BasicIntegration device authorization | `VoxtaCompanionAuthorizationTests` and Unity Play Mode Test Runner, `voxtaSDK-sandbox` | The sample now validates and reuses a saved device token or displays a device verification URL and code while polling, then enables the existing companion with the approved token. Focused Play Mode coverage verified the pre-connection token wiring and empty-token rejection; all tests passed. |
 | | | | |

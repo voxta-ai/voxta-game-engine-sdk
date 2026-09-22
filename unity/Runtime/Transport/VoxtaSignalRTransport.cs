@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,8 +55,7 @@ namespace Voxta.Unity.Transport
                 .AddJsonProtocol(options => options.PayloadSerializerOptions = VoxtaJson.CreateOptions())
                 .Build();
 
-            connection.On<ServerMessage>("ReceiveMessage", message =>
-                UnityMainThreadDispatcher.Post(() => MessageReceived?.Invoke(message)));
+            connection.On<JsonElement>("ReceiveMessage", HandleReceiveMessage);
             connection.Closed += OnClosed;
             connection.Reconnecting += OnReconnecting;
             connection.Reconnected += OnReconnected;
@@ -94,6 +94,27 @@ namespace Voxta.Unity.Transport
             sendQueue.Enqueue(message);
             if (Interlocked.Exchange(ref isSending, 1) == 0)
                 _ = ProcessSendQueueAsync();
+        }
+
+        private void HandleReceiveMessage(JsonElement payload)
+        {
+            try
+            {
+                var message = JsonSerializer.Deserialize<ServerMessage>(payload.GetRawText(), VoxtaJson.CreateOptions());
+                if (message == null) return;
+                UnityMainThreadDispatcher.Post(() => MessageReceived?.Invoke(message));
+            }
+            catch (JsonException exception)
+            {
+                // This SDK intentionally models only a pinned protocol subset. Ignore
+                // server frames outside it so they cannot block later supported frames.
+                if (payload.TryGetProperty("$type", out var type) && type.GetString() == "action")
+                    UnityMainThreadDispatcher.Post(() => Error?.Invoke(exception));
+            }
+            catch (Exception exception)
+            {
+                UnityMainThreadDispatcher.Post(() => Error?.Invoke(exception));
+            }
         }
 
         private async Task ProcessSendQueueAsync()

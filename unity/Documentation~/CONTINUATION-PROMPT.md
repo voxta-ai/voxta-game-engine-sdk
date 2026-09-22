@@ -1,19 +1,23 @@
-# Continuation Prompt: Implement M4 action registration and context publication
+# Continuation Prompt: Expand BasicIntegration voice, spatial audio, and action sample
 
-Continue in `G:\voxta-projects\GitHub\voxta-game-engine-sdk\unity`. M1–M3
-are complete. M4 device authorization is complete: `VoxtaAuth` and
-`PlayerPrefsTokenStore` were added, `VoxtaAuthTests` passed 5/5 in Play Mode,
-and the full browser-approved device flow was verified against the local server.
-M1 generator-drift CI remains intentionally unchecked. Preserve all changes.
+Continue in `G:\voxta-projects\GitHub\voxta-game-engine-sdk\unity`. Preserve all
+existing uncommitted work.
 
-Implement only the next M4 unit: `VoxtaActions` registration and
-`ClientUpdateContextMessage` publication. Before editing, read the development
-plan, `protocol-v0.md`, current Unity client/session/companion code, and the
-pinned server’s action REST/WebSocket contracts plus canonical client behavior.
+M1-M4 and the first M5 unit are complete. BasicIntegration now uses device-flow
+authorization, persists the approved token, authenticates reply-audio downloads,
+and has a scrollable IMGUI diagnostics panel. Its imported copy in
+`G:\Unity\voxtaSDK-sandbox\Assets\Samples\...` is separate from `Samples~`; keep
+the sandbox copy synchronized when validating the sample.
 
-Keep Unity 2022.3/.NET Standard 2.1 compatibility, generate protocol types
-only for verified contracts, dispatch public Unity callbacks on the main
-thread, add focused tests, and verify against the local server. Record verified
-discoveries in `protocol-v0.md` and check only the completed M4 action/context
-item after evidence. Do not implement action dispatch, app triggers, companion
-prefab work, M5, server assemblies, or CI. Use `apply_patch` for edits.
+Implement only the next M5 unit: expand BasicIntegration to clearly demonstrate
+the existing microphone voice path, spatial `AudioSource` playback, and one
+registered `VoxtaActions` game action with visible invocation feedback. Inspect
+the existing companion, microphone, speech-player, actions APIs, scene, sample
+README, and Play Mode test conventions first. Retain text chat, device
+authorization, diagnostics, and explicit live-server tests.
+
+Do not change protocol messages, auth contracts, the reusable prefab, quickstart
+documentation, CI, build-target work, or later M5 items. Add focused Play Mode
+coverage where it does not require a live server, validate in the existing
+sandbox, update only directly affected sample documentation, and mark only this
+M5 plan item after its stated verification passes.

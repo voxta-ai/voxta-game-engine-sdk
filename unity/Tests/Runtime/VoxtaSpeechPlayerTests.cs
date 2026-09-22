@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.TestTools;
 using Voxta.Unity.Protocol.Generated;
 using Voxta.Unity.Transport;
@@ -115,6 +116,31 @@ namespace Voxta.Unity.Tests
             fixture.Dispose();
         }
 
+        [Test]
+        public void ReplyAudioDownloadUsesTheBoundBearerToken()
+        {
+            var fixture = new PlaybackFixture("approved-device-token");
+            try
+            {
+                var request = (UnityWebRequest)typeof(VoxtaSpeechPlayer)
+                    .GetMethod("CreateAudioRequest", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                    .Invoke(fixture.Player, new object[] { new Uri("http://localhost:5384/api/tts/gens/reply") });
+                try
+                {
+                    Assert.That(request.GetRequestHeader("Authorization"), Is.EqualTo("Bearer approved-device-token"));
+                    Assert.That(request.GetRequestHeader("Accept"), Is.EqualTo("audio/x-wav"));
+                }
+                finally
+                {
+                    request.Dispose();
+                }
+            }
+            finally
+            {
+                fixture.Dispose();
+            }
+        }
+
         private sealed class PlaybackFixture : IDisposable
         {
             public readonly FakeTransport Transport = new FakeTransport();
@@ -123,7 +149,7 @@ namespace Voxta.Unity.Tests
             public readonly VoxtaChatSession Session;
             public readonly VoxtaSpeechPlayer Player;
 
-            public PlaybackFixture()
+            public PlaybackFixture(string accessToken = null)
             {
                 Client = new VoxtaClient(Transport);
                 Session = new VoxtaChatSession(Client);
@@ -133,7 +159,7 @@ namespace Voxta.Unity.Tests
                 var gameObject = new GameObject("VoxtaSpeechPlayerTests");
                 gameObject.AddComponent<AudioSource>();
                 Player = gameObject.AddComponent<VoxtaSpeechPlayer>();
-                Player.Bind(Client, Session, new Uri("http://localhost:5384/"));
+                Player.Bind(Client, Session, new Uri("http://localhost:5384/"), accessToken);
             }
 
             public void ReceiveReplyChunk(Guid messageId)

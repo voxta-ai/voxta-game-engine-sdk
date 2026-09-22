@@ -15,6 +15,9 @@ namespace Voxta.Unity
     [Serializable] public sealed class VoxtaRecognitionPartialUnityEvent : UnityEvent<string> { }
     [Serializable] public sealed class VoxtaRecognitionEndUnityEvent : UnityEvent<string> { }
     [Serializable] public sealed class VoxtaAudioFrameUnityEvent : UnityEvent<ServerAudioFrameMessage> { }
+    [Serializable] public sealed class VoxtaContextUpdatedUnityEvent : UnityEvent<ServerContextUpdatedMessage> { }
+    [Serializable] public sealed class VoxtaAnimationPlayUnityEvent : UnityEvent<ServerAnimationPlayMessage> { }
+    [Serializable] public sealed class VoxtaActionErrorUnityEvent : UnityEvent<ServerChatSessionErrorMessage> { }
     [Serializable] public sealed class VoxtaErrorUnityEvent : UnityEvent<string> { }
     [Serializable] public sealed class VoxtaDiagnosticUnityEvent : UnityEvent<string> { }
 
@@ -44,6 +47,9 @@ namespace Voxta.Unity
         [SerializeField] private VoxtaRecognitionPartialUnityEvent onRecognitionPartial = new VoxtaRecognitionPartialUnityEvent();
         [SerializeField] private VoxtaRecognitionEndUnityEvent onRecognitionEnded = new VoxtaRecognitionEndUnityEvent();
         [SerializeField] private VoxtaAudioFrameUnityEvent onAudioFrame = new VoxtaAudioFrameUnityEvent();
+        [SerializeField] private VoxtaContextUpdatedUnityEvent onContextUpdated = new VoxtaContextUpdatedUnityEvent();
+        [SerializeField] private VoxtaAnimationPlayUnityEvent onAnimationPlay = new VoxtaAnimationPlayUnityEvent();
+        [SerializeField] private VoxtaActionErrorUnityEvent onActionError = new VoxtaActionErrorUnityEvent();
         [SerializeField] private VoxtaErrorUnityEvent onError = new VoxtaErrorUnityEvent();
         [SerializeField] private VoxtaDiagnosticUnityEvent onDiagnostic = new VoxtaDiagnosticUnityEvent();
 
@@ -65,6 +71,9 @@ namespace Voxta.Unity
         public event Action<ServerSpeechRecognitionPartialMessage> RecognitionPartialReceived;
         public event Action<ServerSpeechRecognitionEndMessage> RecognitionEnded;
         public event Action<ServerAudioFrameMessage> AudioFrameReceived;
+        public event Action<ServerContextUpdatedMessage> ContextUpdated;
+        public event Action<ServerAnimationPlayMessage> AnimationPlayReceived;
+        public event Action<ServerChatSessionErrorMessage> ActionErrorReceived;
         public event Action<Exception> Error;
         public event Action<string> Diagnostic;
 
@@ -73,6 +82,10 @@ namespace Voxta.Unity
         public VoxtaSpeechPlayer SpeechPlayer => speechPlayer;
         public VoxtaMicrophone Microphone => microphone;
         public VoxtaActions Actions => actions;
+        public VoxtaContextUpdatedUnityEvent OnContextUpdated => onContextUpdated;
+        public VoxtaAnimationPlayUnityEvent OnAnimationPlay => onAnimationPlay;
+        public VoxtaActionErrorUnityEvent OnActionError => onActionError;
+        public string ServerUrl => serverUrl;
 
         private void Awake()
         {
@@ -136,7 +149,7 @@ namespace Voxta.Unity
                 if (actions != null) actions.Bind(session);
                 if (unityPlaybackActive)
                 {
-                    speechPlayer.Bind(client, session, uri);
+                    speechPlayer.Bind(client, session, uri, apiKey);
                     speechPlayer.SpeechStarted += HandleSpeechStarted;
                     speechPlayer.SpeechEnded += HandleSpeechEnded;
                     speechPlayer.SpeechInterrupted += HandleSpeechInterrupted;
@@ -159,6 +172,9 @@ namespace Voxta.Unity
                 session.Started += HandleChatStarted;
                 session.ReplyChunk += HandleReplyChunk;
                 session.ReplyCompleted += HandleReplyCompleted;
+                session.ContextUpdated += HandleContextUpdated;
+                session.AnimationPlayReceived += HandleAnimationPlay;
+                session.ActionErrorReceived += HandleActionError;
                 await client.ConnectAsync();
             }
             catch (Exception exception) { HandleError(exception); }
@@ -175,6 +191,15 @@ namespace Voxta.Unity
             }
             catch (Exception exception) { HandleError(exception); }
         }
+
+        /// <summary>Sets the API key used by the next connection attempt.</summary>
+        public void SetApiKey(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("An API key is required.", nameof(value));
+            if (client != null) throw new InvalidOperationException("Disconnect before changing the API key.");
+            apiKey = value;
+        }
+
         public void InterruptSpeech() { try { speechPlayer?.Interrupt(); } catch (Exception exception) { HandleError(exception); } }
         public async void Disconnect() { if (client == null) return; try { await client.DisconnectAsync(); } catch (Exception exception) { HandleError(exception); } }
         private void StartConfiguredChat()
@@ -225,6 +250,14 @@ namespace Voxta.Unity
             catch (Exception exception) { HandleError(exception); }
         }
         private void HandleAudioFrame(ServerAudioFrameMessage value) { AudioFrameReceived?.Invoke(value); onAudioFrame.Invoke(value); }
+        private void HandleContextUpdated(ServerContextUpdatedMessage value) { ContextUpdated?.Invoke(value); onContextUpdated.Invoke(value); }
+        private void HandleAnimationPlay(ServerAnimationPlayMessage value) { AnimationPlayReceived?.Invoke(value); onAnimationPlay.Invoke(value); }
+        private void HandleActionError(ServerChatSessionErrorMessage value)
+        {
+            ActionErrorReceived?.Invoke(value);
+            onActionError.Invoke(value);
+            HandleError(new VoxtaChatSessionException(value));
+        }
         private string DescribeAudioOutput(bool unityPlaybackActive)
         {
             if (unityPlaybackActive) return "Unity speech playback is enabled; advertising audioOutput: Url.";
@@ -247,6 +280,17 @@ namespace Voxta.Unity
             Debug.Log("Voxta " + message, this);
             Diagnostic?.Invoke(message);
             onDiagnostic.Invoke(message);
+        }
+    }
+
+    public sealed class VoxtaChatSessionException : Exception
+    {
+        public ServerChatSessionErrorMessage ServerMessage { get; }
+
+        internal VoxtaChatSessionException(ServerChatSessionErrorMessage serverMessage)
+            : base(serverMessage?.Message ?? "Voxta chat session error.")
+        {
+            ServerMessage = serverMessage ?? throw new ArgumentNullException(nameof(serverMessage));
         }
     }
 }
