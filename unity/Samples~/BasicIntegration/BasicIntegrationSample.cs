@@ -1,12 +1,15 @@
 using System;
 using System.Threading;
 using UnityEngine;
+using Voxta.Unity.Protocol.Generated;
 
 namespace Voxta.Unity.Samples.BasicIntegration
 {
     /// <summary>Renders a minimal text chat panel without requiring a UI prefab.</summary>
     public sealed class BasicIntegrationSample : MonoBehaviour
     {
+        public const string WaveActionName = "wave";
+
         [SerializeField] private VoxtaCompanion companion;
         private string input = string.Empty;
         private string transcript = string.Empty;
@@ -16,10 +19,20 @@ namespace Voxta.Unity.Samples.BasicIntegration
         private VoxtaDeviceCode deviceCode;
         private CancellationTokenSource authorizationCancellation;
         private bool authorizationComplete;
+        private string voiceFeedback = "Microphone is waiting for a server recording request.";
+        private string actionFeedback = "No game action has been invoked yet.";
 
         private void Awake()
         {
             if (companion == null) throw new InvalidOperationException("The Basic Integration sample requires a VoxtaCompanion.");
+            if (companion.Actions == null) throw new InvalidOperationException("The Basic Integration sample requires a VoxtaActions component.");
+
+            companion.Actions.SetActions(new[] { CreateWaveActionDefinition() });
+            companion.Actions.RegisterHandler(WaveActionName, HandleWaveAction);
+
+            if (companion.Microphone == null) throw new InvalidOperationException("The Basic Integration sample requires a VoxtaMicrophone component.");
+            companion.Microphone.CaptureStarted += HandleMicrophoneCaptureStarted;
+            companion.Microphone.CaptureStopped += HandleMicrophoneCaptureStopped;
 
             status = companion.ConnectionState.ToString();
             companion.ReplyChunkReceived += chunk => transcript += chunk.Text;
@@ -29,10 +42,21 @@ namespace Voxta.Unity.Samples.BasicIntegration
                 + "), " + metrics.DurationSeconds.ToString("F3") + "s");
             companion.SpeechEnded += messageId => AddDiagnostic("Speech completed: " + messageId);
             companion.SpeechInterrupted += messageId => AddDiagnostic("Speech interrupted: " + messageId);
-            companion.RecognitionStarted += () => AddDiagnostic("Speech recognition started.");
-            companion.RecognitionPartialReceived += value => AddDiagnostic("Speech partial: " + value.Text);
+            companion.RecognitionStarted += () =>
+            {
+                voiceFeedback = "Listening for your voice...";
+                AddDiagnostic("Speech recognition started.");
+            };
+            companion.RecognitionPartialReceived += value =>
+            {
+                voiceFeedback = "Heard: " + value.Text;
+                AddDiagnostic("Speech partial: " + value.Text);
+            };
             companion.RecognitionEnded += value =>
             {
+                voiceFeedback = string.IsNullOrWhiteSpace(value.Text)
+                    ? "Voice recognition ended without a transcript."
+                    : "Sent voice transcript: " + value.Text;
                 AddDiagnostic("Speech recognition ended: " + (value.Text ?? "(empty)") + " (" + value.Reason + ")");
                 if (!string.IsNullOrWhiteSpace(value.Text)) transcript += "You: " + value.Text + "\nVoxta: ";
             };
@@ -45,6 +69,13 @@ namespace Voxta.Unity.Samples.BasicIntegration
 
         private void OnDisable()
         {
+            if (companion != null && companion.Actions != null)
+                companion.Actions.UnregisterHandler(WaveActionName, HandleWaveAction);
+            if (companion != null && companion.Microphone != null)
+            {
+                companion.Microphone.CaptureStarted -= HandleMicrophoneCaptureStarted;
+                companion.Microphone.CaptureStopped -= HandleMicrophoneCaptureStopped;
+            }
             authorizationCancellation?.Cancel();
             authorizationCancellation?.Dispose();
             authorizationCancellation = null;
@@ -99,9 +130,9 @@ namespace Voxta.Unity.Samples.BasicIntegration
 
         private void OnGUI()
         {
-            var panel = new Rect(20, 20, 700, 700);
+            var panel = new Rect(20, 20, 700, 760);
             GUI.Box(panel, GUIContent.none);
-            GUILayout.BeginArea(new Rect(30, 30, 680, 680));
+            GUILayout.BeginArea(new Rect(30, 30, 680, 740));
             GUILayout.Label("Voxta Basic Chat — " + DisplayStatus);
             if (authorizationComplete) RenderChat();
             else RenderAuthorization();
@@ -129,9 +160,33 @@ namespace Voxta.Unity.Samples.BasicIntegration
 
         private void RenderChat()
         {
-            GUILayout.TextArea(transcript, GUILayout.Height(300));
+            RenderVoiceAndActionStatus();
+            GUILayout.TextArea(transcript, GUILayout.Height(250));
             input = GUILayout.TextField(input);
             if (GUILayout.Button("Send")) Send();
+        }
+
+        private void RenderVoiceAndActionStatus()
+        {
+            var microphone = companion.Microphone;
+            var audioSource = companion.SpeechPlayer == null ? null : companion.SpeechPlayer.AudioSource;
+            GUILayout.Label("Voice input: " + (microphone != null && microphone.enabled
+                ? voiceFeedback
+                : "VoxtaMicrophone is disabled."));
+            GUILayout.Label("Reply playback: " + (audioSource != null && audioSource.spatialBlend > 0f
+                ? "3D spatial AudioSource at " + audioSource.transform.position
+                : "No 3D AudioSource is configured."));
+            GUILayout.Label("Game action '" + WaveActionName + "': " + actionFeedback);
+        }
+
+        private void HandleMicrophoneCaptureStarted()
+        {
+            voiceFeedback = "Microphone streaming; waiting for speech recognition...";
+        }
+
+        private void HandleMicrophoneCaptureStopped()
+        {
+            voiceFeedback = "Microphone is waiting for a server recording request.";
         }
 
         private void RenderDiagnostics()
@@ -148,6 +203,23 @@ namespace Voxta.Unity.Samples.BasicIntegration
             transcript += "You: " + input + "\nVoxta: ";
             companion.SendText(input);
             input = string.Empty;
+        }
+
+        /// <summary>Creates the sample action that the server can infer from a conversation.</summary>
+        public static VoxtaActionDefinition CreateWaveActionDefinition()
+        {
+            return new VoxtaActionDefinition(
+                WaveActionName,
+                "Wave at the player when the conversation calls for it.",
+                new VoxtaActionArgument("style", FunctionArgumentType.String, "Optional style for the wave."));
+        }
+
+        private void HandleWaveAction(ServerActionMessage action)
+        {
+            actionFeedback = "Invoked" + (action.Arguments == null || action.Arguments.Length == 0
+                ? "."
+                : " with " + string.Join(", ", Array.ConvertAll(action.Arguments, value => value.Name + "=" + value.Value)) + ".");
+            AddDiagnostic("Game action '" + action.Value + "' " + actionFeedback);
         }
 
         private void AddDiagnostic(string message)

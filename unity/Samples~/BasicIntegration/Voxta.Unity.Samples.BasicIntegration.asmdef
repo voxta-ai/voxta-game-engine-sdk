@@ -1,0 +1,14 @@
+{
+  "name": "Voxta.Unity.Samples.BasicIntegration",
+  "rootNamespace": "Voxta.Unity.Samples.BasicIntegration",
+  "references": ["Voxta.Unity.Runtime"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

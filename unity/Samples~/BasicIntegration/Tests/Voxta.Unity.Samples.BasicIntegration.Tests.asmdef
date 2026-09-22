@@ -1,0 +1,15 @@
+{
+  "name": "Voxta.Unity.Samples.BasicIntegration.Tests",
+  "rootNamespace": "Voxta.Unity.Samples.BasicIntegration.Tests",
+  "references": ["Voxta.Unity.Samples.BasicIntegration", "Voxta.Unity.Runtime"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": ["TestAssemblies"]
+}

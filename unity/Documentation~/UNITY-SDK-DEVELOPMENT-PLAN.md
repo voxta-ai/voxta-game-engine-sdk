@@ -134,9 +134,9 @@ HTTP decoder. The current local-server debugging established these contract fact
 ## M5 — Release-quality package and sample
 
 - [x] Replace temporary API-key setup in the sample with device-flow setup and clear local-server guidance.
-- [ ] Expand the sample to demonstrate voice, spatial playback, and a registered game action.
-- [ ] Write quickstart documentation that reaches a talking companion in under 15 minutes.
-- [ ] Test Mono and IL2CPP builds on supported desktop targets.
+- [x] Expand the sample to demonstrate voice, spatial playback, and a registered game action.
+- [x] Write quickstart documentation that reaches a talking companion in under 15 minutes.
+- [x] Test Mono and IL2CPP builds on supported desktop targets.
 - [ ] Test a package install from the intended git URL in a clean Unity project.
 - [ ] Establish CI for generation drift, tests, package validation, and player builds.
 - [ ] Agree server API versioning and compatibility guarantees before the first public tag.
