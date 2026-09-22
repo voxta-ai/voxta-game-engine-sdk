@@ -1,0 +1,134 @@
+name: Unity package CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/unity-package-ci.yml'
+      - 'Tools/CI/**'
+      - 'Tools/ProtocolGenerator/**'
+      - 'unity/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/unity-package-ci.yml'
+      - 'Tools/CI/**'
+      - 'Tools/ProtocolGenerator/**'
+      - 'unity/**'
+  schedule:
+    - cron: '23 5 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unity-package-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generated-protocol:
+    name: Generated protocol drift
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@v4.3.1
+        with:
+          dotnet-version: 10.0.401
+
+      - name: Fetch the latest Voxta model
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/voxta-ai/voxta-server.git .ci/voxta-server
+          git -C .ci/voxta-server log -1 --format='Testing Voxta.Model commit %H'
+          dotnet build .ci/voxta-server/src/common/Voxta.Model/Voxta.Model.csproj --configuration Release
+
+      - name: Check generated protocol output
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet run --project Tools/ProtocolGenerator/Voxta.ProtocolGenerator.csproj -- \
+            --model .ci/voxta-server/src/common/Voxta.Model/bin/Release/net10.0/Voxta.Model.dll \
+            --output unity/Runtime/Protocol/Generated/M1Messages.g.cs \
+            --check
+
+  unity-package:
+    name: Unity tests, package validation, and desktop builds
+    needs: generated-protocol
+    runs-on: ubuntu-22.04
+    env:
+      UNITY_VERSION: 2022.3.62f3
+      UNITY_IMAGE: unityci/editor:ubuntu-2022.3.62f3-windows-il2cpp-3
+      VALIDATION_PROJECT: .ci/UnityPackageValidation
+      PACKAGE_GIT_URL: ${{ github.event.pull_request.head.repo.clone_url || format('https://github.com/{0}.git', github.repository) }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Create a clean Git-installed validation project
+        shell: pwsh
+        run: |
+          $revision = '${{ github.event.pull_request.head.sha || github.sha }}'
+          ./Tools/CI/Initialize-UnityPackageValidationProject.ps1 -ProjectPath $env:VALIDATION_PROJECT -Revision $revision -PackageGitUrl $env:PACKAGE_GIT_URL
+
+      - name: Resolve the package and import Basic Chat Integration
+        uses: game-ci/unity-builder@v4.3.1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          customImage: ${{ env.UNITY_IMAGE }}
+          projectPath: ${{ env.VALIDATION_PROJECT }}
+          targetPlatform: StandaloneWindows64
+          buildMethod: Voxta.CI.UnityPackageValidationBuild.ImportBasicIntegrationSample
+          allowDirtyBuild: true
+
+      - name: Run package Edit and Play Mode tests
+        uses: game-ci/unity-test-runner@v4.3.1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          customImage: ${{ env.UNITY_IMAGE }}
+          projectPath: ${{ env.VALIDATION_PROJECT }}
+          testMode: all
+          artifactsPath: artifacts/test-results
+
+      - name: Build Basic Chat Integration for Windows Mono
+        uses: game-ci/unity-builder@v4.3.1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          customImage: ${{ env.UNITY_IMAGE }}
+          projectPath: ${{ env.VALIDATION_PROJECT }}
+          targetPlatform: StandaloneWindows64
+          buildMethod: Voxta.CI.UnityPackageValidationBuild.BuildMonoWindows64
+          allowDirtyBuild: true
+
+      - name: Build Basic Chat Integration for Windows IL2CPP
+        uses: game-ci/unity-builder@v4.3.1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          customImage: ${{ env.UNITY_IMAGE }}
+          projectPath: ${{ env.VALIDATION_PROJECT }}
+          targetPlatform: StandaloneWindows64
+          buildMethod: Voxta.CI.UnityPackageValidationBuild.BuildIl2CppWindows64
+          allowDirtyBuild: true
+
+      - name: Upload Unity results and players
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: unity-package-ci-${{ github.run_id }}
+          if-no-files-found: warn
+          path: |
+            artifacts/test-results
+            ${{ env.VALIDATION_PROJECT }}/Builds
+            ${{ env.VALIDATION_PROJECT }}/Logs
