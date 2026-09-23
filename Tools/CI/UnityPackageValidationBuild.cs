@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace Voxta.CI
@@ -15,7 +15,7 @@ namespace Voxta.CI
 
         public static void ImportBasicIntegrationSample()
         {
-            var package = PackageInfo.FindForPackageName(PackageName);
+            var package = UnityEditor.PackageManager.PackageInfo.FindForPackageName(PackageName);
             if (package == null || string.IsNullOrWhiteSpace(package.resolvedPath))
             {
                 throw new BuildFailedException($"UPM did not resolve {PackageName} from its Git dependency.");
@@ -46,7 +46,7 @@ namespace Voxta.CI
         {
             BuildDesktopPlayer(
                 BuildTarget.StandaloneWindows64,
-                ScriptingImplementation.Mono,
+                ScriptingImplementation.Mono2x,
                 "Windows64-Mono",
                 "VoxtaBasicIntegration.exe");
         }

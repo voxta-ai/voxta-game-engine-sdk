@@ -31,6 +31,7 @@ New-Item -ItemType Directory -Force $editorPath, $packagesPath, $projectSettings
 
 $manifest = @{
     dependencies = @{
+        'com.unity.test-framework' = '1.1.33'
         'com.voxta.game-engine-sdk' = "${PackageGitUrl}?path=unity#${Revision}"
     }
     testables = @('com.voxta.game-engine-sdk')
