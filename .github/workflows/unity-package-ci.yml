@@ -87,7 +87,10 @@ jobs:
       UNITY_WINDOWS_MONO_IMAGE: unityci/editor:ubuntu-2022.3.62f3-windows-mono-3.2.2
       UNITY_LINUX_IL2CPP_IMAGE: unityci/editor:ubuntu-2022.3.62f3-linux-il2cpp-3.2.2
       VALIDATION_PROJECT: .ci/UnityPackageValidation
-      PACKAGE_GIT_URL: ${{ github.event.pull_request.head.repo.clone_url || format('https://github.com/{0}.git', github.repository) }}
+      # The package manifest still uses a Git dependency. The repository is not
+      # anonymously readable on hosted runners, so UPM receives this job's
+      # short-lived, read-only token rather than attempting an interactive prompt.
+      PACKAGE_GIT_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.event.pull_request.head.repo.full_name || github.repository }}.git
       # Defined once here, inherited by all Game-CI steps below
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
