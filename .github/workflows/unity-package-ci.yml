@@ -94,6 +94,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4.2.2
         with:
+          # unity-builder's default Semantic versioning reads Git history.
+          # A full checkout prevents its internal git fetch --unshallow call.
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Create a clean Git-installed validation project
