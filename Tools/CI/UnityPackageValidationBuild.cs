@@ -44,15 +44,27 @@ namespace Voxta.CI
 
         public static void BuildMonoWindows64()
         {
-            BuildWindowsPlayer(ScriptingImplementation.Mono, "Windows64-Mono");
+            BuildDesktopPlayer(
+                BuildTarget.StandaloneWindows64,
+                ScriptingImplementation.Mono,
+                "Windows64-Mono",
+                "VoxtaBasicIntegration.exe");
         }
 
-        public static void BuildIl2CppWindows64()
+        public static void BuildIl2CppLinux64()
         {
-            BuildWindowsPlayer(ScriptingImplementation.IL2CPP, "Windows64-IL2CPP");
+            BuildDesktopPlayer(
+                BuildTarget.StandaloneLinux64,
+                ScriptingImplementation.IL2CPP,
+                "Linux64-IL2CPP",
+                "VoxtaBasicIntegration.x86_64");
         }
 
-        private static void BuildWindowsPlayer(ScriptingImplementation scriptingImplementation, string outputDirectory)
+        private static void BuildDesktopPlayer(
+            BuildTarget buildTarget,
+            ScriptingImplementation scriptingImplementation,
+            string outputDirectory,
+            string executableName)
         {
             if (!File.Exists(SampleScenePath))
             {
@@ -63,8 +75,8 @@ namespace Voxta.CI
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
             {
                 scenes = new[] { SampleScenePath },
-                locationPathName = Path.Combine("Builds", outputDirectory, "VoxtaBasicIntegration.exe"),
-                target = BuildTarget.StandaloneWindows64,
+                locationPathName = Path.Combine("Builds", outputDirectory, executableName),
+                target = buildTarget,
                 options = BuildOptions.StrictMode
             });
 

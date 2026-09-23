@@ -84,7 +84,8 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       UNITY_VERSION: 2022.3.62f3
-      UNITY_IMAGE: unityci/editor:ubuntu-2022.3.62f3-windows-il2cpp-3
+      UNITY_WINDOWS_MONO_IMAGE: unityci/editor:ubuntu-2022.3.62f3-windows-mono-3.2.2
+      UNITY_LINUX_IL2CPP_IMAGE: unityci/editor:ubuntu-2022.3.62f3-linux-il2cpp-3.2.2
       VALIDATION_PROJECT: .ci/UnityPackageValidation
       PACKAGE_GIT_URL: ${{ github.event.pull_request.head.repo.clone_url || format('https://github.com/{0}.git', github.repository) }}
       # Defined once here, inherited by all Game-CI steps below
@@ -108,7 +109,7 @@ jobs:
       - name: Resolve the package and import Basic Chat Integration
         uses: game-ci/unity-builder@v4
         with:
-          customImage: ${{ env.UNITY_IMAGE }}
+          customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
           targetPlatform: StandaloneWindows64
           buildMethod: Voxta.CI.UnityPackageValidationBuild.ImportBasicIntegrationSample
@@ -117,7 +118,7 @@ jobs:
       - name: Run package Edit and Play Mode tests
         uses: game-ci/unity-test-runner@v4.3.1
         with:
-          customImage: ${{ env.UNITY_IMAGE }}
+          customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
           testMode: all
           artifactsPath: artifacts/test-results
@@ -125,19 +126,19 @@ jobs:
       - name: Build Basic Chat Integration for Windows Mono
         uses: game-ci/unity-builder@v4
         with:
-          customImage: ${{ env.UNITY_IMAGE }}
+          customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
           targetPlatform: StandaloneWindows64
           buildMethod: Voxta.CI.UnityPackageValidationBuild.BuildMonoWindows64
           allowDirtyBuild: true
 
-      - name: Build Basic Chat Integration for Windows IL2CPP
+      - name: Build Basic Chat Integration for Linux IL2CPP
         uses: game-ci/unity-builder@v4
         with:
-          customImage: ${{ env.UNITY_IMAGE }}
+          customImage: ${{ env.UNITY_LINUX_IL2CPP_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
-          targetPlatform: StandaloneWindows64
-          buildMethod: Voxta.CI.UnityPackageValidationBuild.BuildIl2CppWindows64
+          targetPlatform: StandaloneLinux64
+          buildMethod: Voxta.CI.UnityPackageValidationBuild.BuildIl2CppLinux64
           allowDirtyBuild: true
 
       - name: Upload Unity results and players
