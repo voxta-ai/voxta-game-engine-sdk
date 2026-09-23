@@ -6,6 +6,7 @@
   "unity": "2022.3",
   "dependencies": {
     "com.unity.ugui": "1.0.0",
+    "com.unity.modules.audio": "1.0.0",
     "com.unity.modules.unitywebrequest": "1.0.0"
   },
   "keywords": [
