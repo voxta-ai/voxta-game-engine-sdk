@@ -135,6 +135,13 @@ jobs:
           buildMethod: Voxta.CI.UnityPackageValidationBuild.BuildMonoWindows64
           allowDirtyBuild: true
 
+      - name: Reclaim Windows Mono image space before the IL2CPP build
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker image rm "$UNITY_WINDOWS_MONO_IMAGE"
+          docker system df
+
       - name: Build Basic Chat Integration for Linux IL2CPP
         uses: game-ci/unity-builder@v4
         with:
