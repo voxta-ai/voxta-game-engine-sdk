@@ -26,6 +26,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  voxta-model-update-notice:
+    name: Voxta.Model NuGet update notice
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Check NuGet for a newer Voxta.Model package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $pinned = Get-Content -Raw Tools/ProtocolGenerator/pinned-model.json | ConvertFrom-Json
+          $packageId = $pinned.packageId.ToLowerInvariant()
+
+          try {
+            $index = Invoke-RestMethod -Uri "https://api.nuget.org/v3-flatcontainer/$packageId/index.json"
+            $latestVersion = $index.versions[-1]
+          }
+          catch {
+            Write-Output "::warning title=Voxta.Model NuGet check unavailable::Could not query NuGet for updates: $($_.Exception.Message)"
+            exit 0
+          }
+
+          if ($pinned.packageVersion -eq $latestVersion) {
+            Write-Output "Voxta.Model is current at $latestVersion."
+            exit 0
+          }
+
+          Write-Output "::warning title=Voxta.Model update available::Pinned $($pinned.packageVersion); NuGet latest is $latestVersion. Review and intentionally vendor the new model DLL."
+
   generated-protocol:
     name: Generated protocol drift
     runs-on: ubuntu-22.04
@@ -38,28 +69,12 @@ jobs:
         with:
           dotnet-version: 10.0.401
 
-      - name: Check out the latest Voxta model
-        uses: actions/checkout@v4.2.2
-        with:
-          repository: voxta-ai/voxta-server
-          token: ${{ secrets.VOXTA_SERVER_READ_TOKEN }}
-          path: .ci/voxta-server
-          fetch-depth: 1
-          persist-credentials: false
-
-      - name: Build the latest Voxta model
-        shell: bash
-        run: |
-          set -euo pipefail
-          git -C .ci/voxta-server log -1 --format='Testing Voxta.Model commit %H'
-          dotnet build .ci/voxta-server/src/common/Voxta.Model/Voxta.Model.csproj --configuration Release
-
       - name: Check generated protocol output
         shell: bash
         run: |
           set -euo pipefail
           dotnet run --project Tools/ProtocolGenerator/Voxta.ProtocolGenerator.csproj -- \
-            --model .ci/voxta-server/src/common/Voxta.Model/bin/Release/net10.0/Voxta.Model.dll \
+            --model-info Tools/ProtocolGenerator/pinned-model.json \
             --output unity/Runtime/Protocol/Generated/M1Messages.g.cs \
             --check
 

@@ -1,4 +1,7 @@
 {
-  "serverCommit": "b533b287194af6fc418900d1384fb2fda2f7d286",
-  "assembly": "G:/voxta-projects/GitHub/voxta-server/src/common/Voxta.Model/bin/Debug/net10.0/Voxta.Model.dll"
+  "packageId": "Voxta.Model",
+  "packageVersion": "1.11.0-beta.1",
+  "repositoryCommit": "fcec6e6ed3a5c57c378bab8068a8ad8e7f49a7a8",
+  "assembly": "../../unity/Runtime/Plugins/Voxta.Model/Voxta.Model.dll",
+  "assemblySha512": "F5E60481C1A8A5D44167C6802E2E21D6F92E8531752A3095738381179F24DC137E9FFE602279649ADFE9E836F2BEE76DF6A228A45935AF3A755C5C24440D96D9"
 }

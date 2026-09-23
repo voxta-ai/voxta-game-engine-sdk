@@ -7,3 +7,8 @@ next to their assemblies under `Runtime/Plugins/ThirdParty/licenses/`.
 
 The complete, lock-resolved dependency inventory is maintained in
 `Documentation~/third-party-dependencies.md`.
+
+The package also carries `Voxta.Model 1.11.0-beta.1` as the pinned protocol
+generator input. It is licensed under the Business Source License 1.1; its
+license is copied to `Runtime/Plugins/Voxta.Model/LICENSE.md`. The DLL is
+disabled in Unity and is not part of the runtime dependency closure.

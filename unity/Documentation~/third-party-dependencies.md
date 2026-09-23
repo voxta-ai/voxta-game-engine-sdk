@@ -13,3 +13,14 @@ resolved 8.0.2 assembly rather than an incompatible lower direct declaration.
 The copied assembly inventory and upstream license for each package live beside
 the binaries. `THIRD-PARTY-INVENTORY.txt` records package name, resolved version,
 and source package-cache path used to create this closure.
+
+## Pinned protocol-model input
+
+`Runtime/Plugins/Voxta.Model/Voxta.Model.dll` is the `netstandard2.1` assembly
+from [Voxta.Model 1.11.0-beta.1](https://www.nuget.org/packages/Voxta.Model/1.11.0-beta.1).
+It is an input to `Tools/ProtocolGenerator`, not a Unity runtime assembly. Its
+plugin metadata disables it on every Unity platform because it depends on
+`System.Text.Json` 10.0.12, while the runtime transport's tested dependency
+closure uses 8.0.2. `Tools/ProtocolGenerator/pinned-model.json` records its
+repository commit and SHA-512 hash; the generator verifies the hash before
+writing or checking generated protocol code.

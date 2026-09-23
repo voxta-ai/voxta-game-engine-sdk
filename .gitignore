@@ -59,6 +59,9 @@ ExportedObj/
 *.opendb
 *.VC.db
 
+# The protocol generator is a repository-owned .NET tool, not Unity-generated output.
+!Tools/ProtocolGenerator/Voxta.ProtocolGenerator.csproj
+
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta
