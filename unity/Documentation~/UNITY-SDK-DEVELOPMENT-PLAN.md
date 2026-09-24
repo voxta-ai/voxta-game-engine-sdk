@@ -42,8 +42,8 @@ The SDK owns its transport implementation under `Runtime/Transport/`. It bundles
 
 - [x] Add package-level `README.md`, `CHANGELOG.md`, `LICENSE.md`, and third-party notices.
 - [x] Add `Runtime/Voxta.Unity.Runtime.asmdef` with only the required Unity module references.
-- [x] Add `Editor/Voxta.Unity.Editor.asmdef` only for package inspector and authoring support.
-- [x] Add `Tests/Runtime` and `Tests/Editor` assemblies.
+- [x] Add `Tests/Runtime` assemblies.
+- [x] Defer package editor support until an inspector or authoring feature requires it; the unused `Editor` and `Tests/Editor` assemblies were removed.
 - [x] Add the BasicIntegration sample `link.xml` that preserves SignalR, HTTP connections, serializer, and generated DTO types for IL2CPP. Unity ignores linker files inside UPM packages, so the sample imports it beneath the consuming project's `Assets` tree.
 - [x] Bundle the pinned managed SignalR dependency closure under `Runtime/Plugins/ThirdParty/` with valid Unity plugin metadata and license notices.
 

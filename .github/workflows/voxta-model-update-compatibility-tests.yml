@@ -1,4 +1,4 @@
-name: Voxta.Model update-compatiblity tests
+name: Voxta.Model update compatibility tests
 
 on:
   workflow_dispatch:

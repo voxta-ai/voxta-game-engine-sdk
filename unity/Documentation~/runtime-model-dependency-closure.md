@@ -1,101 +1,66 @@
-# Runtime `Voxta.Model` dependency closure
+# Shipped runtime dependency closure
 
-This is the shipped closure for the runtime `Voxta.Model` migration. The
-SignalR 10 / JSON 10 assemblies and `Voxta.Model.dll` in
-`Runtime/Plugins/ThirdParty` were promoted atomically after the Unity
-compatibility probe passed on 2026-09-23.
+The Unity package vendors a complete managed dependency closure in
+`Runtime/Plugins/ThirdParty`. Consumer projects do not restore NuGet packages:
+Unity loads the selected DLLs from the package.
 
-## Selection
+## Current closure
 
-The candidate is restored for `netstandard2.1` with the .NET 10.0.401 SDK and a
-locked `packages.lock.json`. `Microsoft.AspNetCore.SignalR.Client` 10.0.12 was
-selected because it is the SignalR patch in the same servicing family as
-`System.Text.Json` 10.0.12 required by `Voxta.Model` 1.11.0-beta.1.
+The package ships 24 assemblies:
 
-The restore inputs are stored in
-`Documentation~/RuntimeModelDependencyProbe/`. Each package is downloaded from
-`https://api.nuget.org/v3-flatcontainer/<lowercase-package-id>/<version>/<lowercase-package-id>.<version>.nupkg`.
-The lock file contains NuGet's SHA-512 content hash for every package; the
-inventory contains the selected assembly SHA-512 hashes and the license data.
+- `Voxta.Model` **1.11.0-beta.1**, selected from
+  `lib/netstandard2.1/Voxta.Model.dll`.
+- SignalR, ASP.NET Core connection, Microsoft.Extensions, JSON, pipeline,
+  channels, diagnostics, encoding, and time-provider packages at **10.0.12**.
+- `System.Runtime.CompilerServices.Unsafe` **6.1.2**.
 
-## Selected runtime assemblies
+Each DLL is enabled for the Unity Editor and standalone Windows, Linux, and
+macOS. The full package versions, NuGet source URLs, selected assets, package
+content hashes, assembly hashes, and license information are the source of
+truth in:
 
-Every listed package uses the shown `lib` asset. All Microsoft and System
-packages use the MIT license. `Voxta.Model` uses the included Business Source
-License 1.1 (`LICENSE.md`).
+- `Runtime/Plugins/ThirdParty/RUNTIME-MODEL-DEPENDENCY-INVENTORY.json`
+- `Runtime/Plugins/ThirdParty/THIRD-PARTY-INVENTORY.txt`
+- `Runtime/Plugins/ThirdParty/licenses/`
+- `Documentation~/RuntimeModelDependencyProbe/packages.lock.json`
 
-| Package | Version | Selected asset |
-| --- | --- | --- |
-| Microsoft.AspNetCore.Connections.Abstractions | 10.0.12 | lib/netstandard2.1/Microsoft.AspNetCore.Connections.Abstractions.dll |
-| Microsoft.AspNetCore.Http.Connections.Client | 10.0.12 | lib/netstandard2.1/Microsoft.AspNetCore.Http.Connections.Client.dll |
-| Microsoft.AspNetCore.Http.Connections.Common | 10.0.12 | lib/netstandard2.0/Microsoft.AspNetCore.Http.Connections.Common.dll |
-| Microsoft.AspNetCore.SignalR.Client | 10.0.12 | lib/netstandard2.0/Microsoft.AspNetCore.SignalR.Client.dll |
-| Microsoft.AspNetCore.SignalR.Client.Core | 10.0.12 | lib/netstandard2.1/Microsoft.AspNetCore.SignalR.Client.Core.dll |
-| Microsoft.AspNetCore.SignalR.Common | 10.0.12 | lib/netstandard2.0/Microsoft.AspNetCore.SignalR.Common.dll |
-| Microsoft.AspNetCore.SignalR.Protocols.Json | 10.0.12 | lib/netstandard2.0/Microsoft.AspNetCore.SignalR.Protocols.Json.dll |
-| Microsoft.Bcl.AsyncInterfaces | 10.0.12 | lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll |
-| Microsoft.Bcl.TimeProvider | 10.0.12 | lib/netstandard2.0/Microsoft.Bcl.TimeProvider.dll |
-| Microsoft.Extensions.DependencyInjection | 10.0.12 | lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.dll |
-| Microsoft.Extensions.DependencyInjection.Abstractions | 10.0.12 | lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.dll |
-| Microsoft.Extensions.Features | 10.0.12 | lib/netstandard2.0/Microsoft.Extensions.Features.dll |
-| Microsoft.Extensions.Logging | 10.0.12 | lib/netstandard2.1/Microsoft.Extensions.Logging.dll |
-| Microsoft.Extensions.Logging.Abstractions | 10.0.12 | lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.dll |
-| Microsoft.Extensions.Options | 10.0.12 | lib/netstandard2.1/Microsoft.Extensions.Options.dll |
-| Microsoft.Extensions.Primitives | 10.0.12 | lib/netstandard2.0/Microsoft.Extensions.Primitives.dll |
-| System.Diagnostics.DiagnosticSource | 10.0.12 | lib/netstandard2.0/System.Diagnostics.DiagnosticSource.dll |
-| System.IO.Pipelines | 10.0.12 | lib/netstandard2.0/System.IO.Pipelines.dll |
-| System.Net.ServerSentEvents | 10.0.12 | lib/netstandard2.0/System.Net.ServerSentEvents.dll |
-| System.Runtime.CompilerServices.Unsafe | 6.1.2 | lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll |
-| System.Text.Encodings.Web | 10.0.12 | lib/netstandard2.0/System.Text.Encodings.Web.dll |
-| System.Text.Json | 10.0.12 | lib/netstandard2.0/System.Text.Json.dll |
-| System.Threading.Channels | 10.0.12 | lib/netstandard2.1/System.Threading.Channels.dll |
-| Voxta.Model | 1.11.0-beta.1 | lib/netstandard2.1/Voxta.Model.dll |
+`Tools/ModelDependencies/VoxtaModel/pinned-model.json` records the intentionally
+selected `Voxta.Model` package, repository commit, and shipped assembly hash.
 
-`System.Buffers` 4.6.1, `System.ComponentModel.Annotations` 5.0.0,
-`System.Memory` 4.6.3, and `System.Threading.Tasks.Extensions` 4.6.3 are
-present in the lock graph but supply only `netstandard2.1` platform placeholders
-or reference assets. They must not be copied into the candidate Unity plug-in
-folder. `System.Numerics.Vectors` is absent from the target graph.
+## Intentional exclusions
 
-## Comparison with the shipped SignalR 8 closure
+The lock graph includes `System.Buffers` 4.6.1,
+`System.ComponentModel.Annotations` 5.0.0, `System.Memory` 4.6.3, and
+`System.Threading.Tasks.Extensions` 4.6.3. For this `netstandard2.1` Unity
+closure, they provide platform placeholders or reference assets. Unity supplies
+the corresponding APIs, so those DLLs must not be copied into the package.
 
-All existing SignalR, ASP.NET Core, `Microsoft.Extensions`, BCL, diagnostic,
-pipeline, encoding, JSON, and channels assemblies are replaced by the versions
-above. `Microsoft.Bcl.TimeProvider` moves from 8.0.1 to 10.0.12 and
-`System.Runtime.CompilerServices.Unsafe` moves from 6.0.0 to 6.1.2.
-`System.Net.ServerSentEvents` 10.0.12 and `Voxta.Model` are additions.
-The shipped `System.Buffers`, `System.ComponentModel.Annotations`,
-`System.Memory`, `System.Numerics.Vectors`, and
-`System.Threading.Tasks.Extensions` DLLs are removals from the candidate
-plug-in folder because the target framework supplies those references.
+`System.Numerics.Vectors` is not present in the target graph and is not shipped.
 
-The existing DLL inventory uses package versions, which can differ from assembly
-versions; promotion must compare package version, selected asset, package hash,
-and assembly hash from the candidate inventory rather than assembly version
-alone.
+## Verification
 
-## Unity probe record
+Run this from the repository root after changing the vendored closure:
 
-On 2026-09-23, Unity 2022.3.62f3 opened the isolated probe in batch mode and
-ran `Voxta.CompatibilityProbe.Editor.CandidatePluginImportSettings.ConfigureAndVerify`.
-The `ClientAuthenticateMessage` JSON 10 round trip passed. The generated plugin
-metadata explicitly enables all 24 candidate assemblies for the Editor and
-standalone Windows, Linux, and macOS, and disables `Any platform`.
+```powershell
+pwsh ./Tools/ModelDependencies/VoxtaModel/Validate-VoxtaModelDependencyClosure.ps1
+```
 
-On 2026-09-23, the configured probe scene built and ran as Windows x64
-development players under both Mono and IL2CPP. Both players completed the
-`ClientAuthenticateMessage` JSON round trip. The IL2CPP build ran UnityLinker
-with the project's normal stripping settings and converted `Voxta.Model`,
-`System.Text.Json`, `System.Text.Encodings.Web`, `System.IO.Pipelines`, and
-`System.Runtime.CompilerServices.Unsafe`. Neither the build nor player logs
-reported a candidate-assembly identity/load failure, linker failure, missing
-method, reflection failure, or serialization warning. No preservation rule was
-required for this exercised path.
+The audit verifies that the shipped DLL names, assembly identities, versions,
+hashes, lock entries, and license notices match the inventory. Add
+`-VerifyPackageAssets` when the locked NuGet artifacts are available in the
+local package cache; it also verifies each package content hash and selected
+asset hash.
 
-The headless player logs include expected Null-graphics shader errors and a
-development-debugger port warning; these are unrelated to the candidate
-closure. Linux and macOS player validation remains for the later package/CI
-stage. On 2026-09-23, the verified 24-assembly closure was promoted into
-`Runtime/Plugins/ThirdParty`, including runtime-enabled `Voxta.Model.dll` and
-the locked inventory/hash validator. The shipped third-party notices now
-describe the SignalR 10 / System.Text.Json 10.0.12 closure.
+## Updating the closure
+
+A newer `Voxta.Model` release is first exercised by the scheduled
+`Voxta.Model update compatibility tests` workflow. The canary replaces only
+`Voxta.Model.dll` in an isolated package and runs Unity tests and desktop
+builds. It never changes the pinned production package.
+
+A passing canary makes a version a candidate for review; it does not promote
+it. To update the shipped closure, intentionally select the new package and
+refresh the complete dependency set, inventory, lock data, plugin metadata,
+and license notices together. Then run the audit above and the Unity package
+validation workflow. This prevents mixed assembly versions and duplicate type
+identities in consumer projects.
