@@ -119,11 +119,8 @@ jobs:
           customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
           targetPlatform: StandaloneWindows64
-          buildMethod: Voxta.CI.UnityPackageValidationBuild.ValidatePackageForTests
-          customParameters: >-
-            -runTests
-            -testPlatform PlayMode
-            -testResults /github/workspace/artifacts/test-results/playmode-results.xml
+          buildMethod: Voxta.CI.UnityPackageValidationBuild.RunPlayModeTests
+          manualExit: true
           allowDirtyBuild: true
 
       - name: Upload package test results
