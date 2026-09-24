@@ -9,14 +9,26 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $repositoryRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $thirdPartyRoot = Join-Path $repositoryRoot 'unity/Runtime/Plugins/ThirdParty'
-$inventoryPath = Join-Path $thirdPartyRoot 'RUNTIME-MODEL-DEPENDENCY-INVENTORY.json'
+$voxtaRoot = Join-Path $repositoryRoot 'unity/Runtime/Plugins/Voxta'
+$thirdPartyInventoryPath = Join-Path $thirdPartyRoot 'RUNTIME-MODEL-DEPENDENCY-INVENTORY.json'
+$voxtaInventoryPath = Join-Path $voxtaRoot 'VOXTA-MODEL-INVENTORY.json'
 $lockPath = Join-Path $repositoryRoot 'Tools/ModelDependencies/VoxtaModel/Probe/packages.lock.json'
 
-if (-not (Test-Path -LiteralPath $inventoryPath)) {
-    throw "Missing runtime dependency inventory: $inventoryPath"
+foreach ($inventoryPath in @($thirdPartyInventoryPath, $voxtaInventoryPath)) {
+    if (-not (Test-Path -LiteralPath $inventoryPath)) {
+        throw "Missing runtime dependency inventory: $inventoryPath"
+    }
 }
 
-$inventory = @(Get-Content -Raw -LiteralPath $inventoryPath | ConvertFrom-Json | ForEach-Object { $_ })
+$thirdPartyInventory = @(Get-Content -Raw -LiteralPath $thirdPartyInventoryPath | ConvertFrom-Json | ForEach-Object {
+    $_ | Add-Member -NotePropertyName pluginRoot -NotePropertyValue $thirdPartyRoot -Force
+    $_
+})
+$voxtaInventory = @(Get-Content -Raw -LiteralPath $voxtaInventoryPath | ConvertFrom-Json | ForEach-Object {
+    $_ | Add-Member -NotePropertyName pluginRoot -NotePropertyValue $voxtaRoot -Force
+    $_
+})
+$inventory = @($thirdPartyInventory + $voxtaInventory)
 if ($inventory.Count -ne 24) {
     throw "Expected 24 runtime assemblies, found $($inventory.Count) inventory entries."
 }
@@ -26,13 +38,18 @@ if ($duplicates) {
     throw "Duplicate assembly inventory entries: $($duplicates.Name -join ', ')"
 }
 
+$pluginRoots = @($thirdPartyRoot, $voxtaRoot)
 $expectedAssemblies = @($inventory.assembly | Sort-Object)
-$actualAssemblies = @(Get-ChildItem -LiteralPath $thirdPartyRoot -File -Filter '*.dll' | Select-Object -ExpandProperty Name | Sort-Object)
+$actualAssemblies = @(
+    foreach ($pluginRoot in $pluginRoots) {
+        Get-ChildItem -LiteralPath $pluginRoot -File -Filter '*.dll' | Select-Object -ExpandProperty Name
+    }
+) | Sort-Object
 if (Compare-Object $expectedAssemblies $actualAssemblies) {
-    throw 'Vendored DLL filenames do not exactly match RUNTIME-MODEL-DEPENDENCY-INVENTORY.json.'
+    throw 'Vendored DLL filenames do not exactly match their inventories.'
 }
 
-foreach ($assemblyFile in Get-ChildItem -LiteralPath $thirdPartyRoot -File -Filter '*.dll') {
+foreach ($assemblyFile in @(foreach ($pluginRoot in $pluginRoots) { Get-ChildItem -LiteralPath $pluginRoot -File -Filter '*.dll' })) {
     $identity = [Reflection.AssemblyName]::GetAssemblyName($assemblyFile.FullName)
     if (($identity.Name -eq 'System.Text.Json' -or $identity.Name -like 'Microsoft.AspNetCore.SignalR.*') -and $identity.Version.Major -eq 8) {
         throw "SignalR 8 / System.Text.Json 8 assembly detected in the vendored closure: $($assemblyFile.Name) ($identity)."
@@ -43,7 +60,7 @@ $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json
 $lockDependencies = $lock.dependencies.'.NETStandard,Version=v2.1'
 
 foreach ($entry in $inventory) {
-    $assemblyPath = Join-Path $thirdPartyRoot $entry.assembly
+    $assemblyPath = Join-Path $entry.pluginRoot $entry.assembly
     $assemblyVersion = [Reflection.AssemblyName]::GetAssemblyName($assemblyPath).Version
     if (($entry.assembly -eq 'System.Text.Json.dll' -or $entry.assembly -like 'Microsoft.AspNetCore.SignalR.*.dll') -and $assemblyVersion.Major -ne 10) {
         throw "Expected a 10.x $($entry.assembly) assembly, found $assemblyVersion."
@@ -59,7 +76,7 @@ foreach ($entry in $inventory) {
     }
 
     $licenseName = "org.nuget.$($entry.packageId.ToLowerInvariant())-License.md"
-    if (-not (Test-Path -LiteralPath (Join-Path $thirdPartyRoot "licenses/$licenseName"))) {
+    if (-not (Test-Path -LiteralPath (Join-Path $entry.pluginRoot "licenses/$licenseName"))) {
         throw "Missing license notice for $($entry.packageId): $licenseName"
     }
 
@@ -82,19 +99,14 @@ foreach ($entry in $inventory) {
         $archive = [IO.Compression.ZipFile]::OpenRead($nupkgPath)
         try {
             $asset = $archive.Entries | Where-Object FullName -eq $entry.asset
-            if ($null -eq $asset) {
-                throw "Package $($entry.packageId) does not contain $($entry.asset)."
-            }
-
+            if ($null -eq $asset) { throw "Package $($entry.packageId) does not contain $($entry.asset)." }
             $stream = $asset.Open()
             try {
                 $memory = [IO.MemoryStream]::new()
                 try {
                     $stream.CopyTo($memory)
                     $assetSha512 = [Security.Cryptography.SHA512]::Create()
-                    try {
-                        $assetHash = ($assetSha512.ComputeHash($memory.ToArray()) | ForEach-Object ToString x2) -join ''
-                    }
+                    try { $assetHash = ($assetSha512.ComputeHash($memory.ToArray()) | ForEach-Object ToString x2) -join '' }
                     finally { $assetSha512.Dispose() }
                 }
                 finally { $memory.Dispose() }
@@ -103,13 +115,9 @@ foreach ($entry in $inventory) {
         }
         finally { $archive.Dispose() }
 
-        if ($assetHash -ne $entry.assemblySha512) {
-            throw "Package asset hash mismatch for $($entry.packageId): $($entry.asset)"
-        }
+        if ($assetHash -ne $entry.assemblySha512) { throw "Package asset hash mismatch for $($entry.packageId): $($entry.asset)" }
     }
 }
 
 Write-Host "Validated $($inventory.Count) vendored runtime assemblies and their locked restore metadata."
-if ($VerifyPackageAssets) {
-    Write-Host 'Validated the corresponding NuGet package and selected asset SHA-512 hashes.'
-}
+if ($VerifyPackageAssets) { Write-Host 'Validated the corresponding NuGet package and selected asset SHA-512 hashes.' }

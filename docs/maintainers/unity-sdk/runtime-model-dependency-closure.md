@@ -1,7 +1,7 @@
 # Shipped runtime dependency closure
 
 The Unity package vendors a complete managed dependency closure in
-`Runtime/Plugins/ThirdParty`. Consumer projects do not restore NuGet packages:
+`Runtime/Plugins/ThirdParty` and `Runtime/Plugins/Voxta`. Consumer projects do not restore NuGet packages:
 Unity loads the selected DLLs from the package.
 
 ## Current closure
@@ -19,9 +19,9 @@ macOS. The full package versions, NuGet source URLs, selected assets, package
 content hashes, assembly hashes, and license information are the source of
 truth in:
 
-- `Runtime/Plugins/ThirdParty/RUNTIME-MODEL-DEPENDENCY-INVENTORY.json`
+- `Runtime/Plugins/ThirdParty/RUNTIME-MODEL-DEPENDENCY-INVENTORY.json` for third-party assemblies`n- `Runtime/Plugins/Voxta/VOXTA-MODEL-INVENTORY.json` for `Voxta.Model.dll`
 - `Runtime/Plugins/ThirdParty/THIRD-PARTY-INVENTORY.txt`
-- `Runtime/Plugins/ThirdParty/licenses/`
+- `Runtime/Plugins/ThirdParty/licenses/` and `Runtime/Plugins/Voxta/licenses/`
 - `Tools/ModelDependencies/VoxtaModel/Probe/packages.lock.json`
 
 `Tools/ModelDependencies/VoxtaModel/pinned-model.json` records the intentionally

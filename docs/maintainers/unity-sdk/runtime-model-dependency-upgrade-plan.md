@@ -55,7 +55,7 @@ The probe stores its build scene at `Compatibility~/RuntimeModelUnity2022Probe/A
 ## 3. Vendor the selected closure reproducibly
 
 - [x] Download the selected package assets outside the Unity runtime and verify each artifact against its recorded hash.
-- [x] Replace the contents of `Runtime/Plugins/ThirdParty/` as one atomic dependency-closure update.
+- [x] Replace the managed dependency closure in `Runtime/Plugins/ThirdParty/` and the pinned `Voxta.Model.dll` in `Runtime/Plugins/Voxta/` as one atomic update.
 - [x] Move `Voxta.Model.dll` from its disabled generator-only import configuration to the runtime plugin configuration.
 - [x] Update plugin `.meta` files so required runtime DLLs are enabled and generator-only tooling assets remain excluded from Unity as appropriate.
 - [x] Add or update a repeatable maintenance script that validates the vendored filenames, versions, and hashes without restoring them at consumer build time.

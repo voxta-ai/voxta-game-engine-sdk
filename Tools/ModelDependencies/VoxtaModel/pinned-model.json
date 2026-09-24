@@ -2,6 +2,6 @@
   "packageId": "Voxta.Model",
   "packageVersion": "1.11.0-beta.1",
   "repositoryCommit": "fcec6e6ed3a5c57c378bab8068a8ad8e7f49a7a8",
-  "assembly": "../../../unity/Runtime/Plugins/ThirdParty/Voxta.Model.dll",
+  "assembly": "../../../unity/Runtime/Plugins/Voxta/Voxta.Model.dll",
   "assemblySha512": "F5E60481C1A8A5D44167C6802E2E21D6F92E8531752A3095738381179F24DC137E9FFE602279649ADFE9E836F2BEE76DF6A228A45935AF3A755C5C24440D96D9"
 }

@@ -91,7 +91,7 @@ jobs:
             throw "Voxta.Model $env:CANDIDATE_VERSION has no lib/netstandard2.1/Voxta.Model.dll asset."
           }
 
-          Copy-Item -LiteralPath $candidateAssembly -Destination (Join-Path $env:CANDIDATE_PACKAGE 'Runtime/Plugins/ThirdParty/Voxta.Model.dll') -Force
+          Copy-Item -LiteralPath $candidateAssembly -Destination (Join-Path $env:CANDIDATE_PACKAGE 'Runtime/Plugins/Voxta/Voxta.Model.dll') -Force
           Write-Output "Prepared isolated package with Voxta.Model $env:CANDIDATE_VERSION."
 
       - name: Create candidate validation project

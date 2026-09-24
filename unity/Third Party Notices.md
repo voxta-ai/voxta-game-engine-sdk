@@ -12,4 +12,4 @@ The complete dependency inventory is in
 
 `Voxta.Model 1.11.0-beta.1` is a runtime dependency and is licensed under the
 Business Source License 1.1. Its license is copied to
-`Runtime/Plugins/ThirdParty/licenses/org.nuget.voxta.model-License.md`.
+`Runtime/Plugins/Voxta/licenses/org.nuget.voxta.model-License.md`.
