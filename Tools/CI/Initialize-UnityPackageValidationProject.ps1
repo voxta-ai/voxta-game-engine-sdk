@@ -32,9 +32,6 @@ New-Item -ItemType Directory -Force $editorPath, $packagesPath, $projectSettings
 $manifest = @{
     dependencies = @{
         'com.unity.test-framework' = '1.1.33'
-        # game-ci/unity-test-runner always enables coverage and combines its
-        # results, so the clean consumer project must provide this package.
-        'com.unity.testtools.codecoverage' = '1.2.6'
         'com.voxta.game-engine-sdk' = "${PackageGitUrl}?path=unity#${Revision}"
     }
     testables = @('com.voxta.game-engine-sdk')
