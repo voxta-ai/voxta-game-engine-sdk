@@ -13,13 +13,19 @@ namespace Voxta.CI
         private const string ImportedSamplePath = "Assets/Samples/Voxta Game Engine SDK/Basic Chat Integration";
         private const string SampleScenePath = ImportedSamplePath + "/BasicIntegration.unity";
 
-        public static void ImportBasicIntegrationSample()
+        public static void ValidatePackageForTests()
         {
             var package = UnityEditor.PackageManager.PackageInfo.FindForPackageName(PackageName);
             if (package == null || string.IsNullOrWhiteSpace(package.resolvedPath))
             {
                 throw new BuildFailedException($"UPM did not resolve {PackageName} from its Git dependency.");
             }
+        }
+
+        public static void ImportBasicIntegrationSample()
+        {
+            ValidatePackageForTests();
+            var package = UnityEditor.PackageManager.PackageInfo.FindForPackageName(PackageName)!;
 
             var source = Path.Combine(package.resolvedPath, "Samples~", "BasicIntegration");
             if (!Directory.Exists(source))
