@@ -120,3 +120,6 @@ InitTestScene*.unity*
 /unity/Compatibility~/**/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
 !Tools/ModelDependencies/VoxtaModel/Probe/VoxtaModelClosureProbe.csproj
+
+# JetBrains project metadata for the Unity package.
+/unity/.idea/
