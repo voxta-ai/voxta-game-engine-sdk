@@ -115,7 +115,6 @@ jobs:
           customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
           testMode: all
-          coverageEnabled: false
           artifactsPath: artifacts/test-results
 
       - name: Build Basic Chat Integration for Windows Mono
