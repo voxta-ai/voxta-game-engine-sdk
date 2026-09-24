@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [switch]$VerifyPackageAssets,
-    [string]$PackageRoot = (Join-Path $env:USERPROFILE '.nuget/packages')
+    [string]$PackageRoot = (Join-Path $(if ($env:USERPROFILE) { $env:USERPROFILE } else { $HOME }) '.nuget/packages')
 )
 
 $ErrorActionPreference = 'Stop'
