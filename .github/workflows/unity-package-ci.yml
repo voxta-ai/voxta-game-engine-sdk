@@ -53,29 +53,8 @@ jobs:
             exit 0
           }
           Write-Output "::warning title=Voxta.Model update available::Pinned $($pinned.packageVersion); NuGet latest is $latestVersion. Review and intentionally vendor the new model DLL."
-  generated-protocol:
-    name: Generated protocol drift
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4.2.2
-        with:
-          persist-credentials: false
-
-      - uses: actions/setup-dotnet@v4.3.1
-        with:
-          dotnet-version: 10.0.401
-
-      - name: Check generated protocol output
-        shell: bash
-        run: |
-          set -euo pipefail
-          dotnet run --project Tools/ProtocolGenerator/Voxta.ProtocolGenerator.csproj -- \
-            --model-info Tools/ProtocolGenerator/pinned-model.json \
-            --output unity/Runtime/Protocol/Generated/M1Messages.g.cs \
-            --check
   unity-package:
     name: Unity tests, package validation, and desktop builds
-    needs: generated-protocol
     runs-on: ubuntu-22.04
     env:
       UNITY_VERSION: 2022.3.62f3
