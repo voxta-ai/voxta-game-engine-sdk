@@ -9,12 +9,8 @@ on:
       - 'Tools/ProtocolGenerator/**'
       - 'unity/**'
   push:
-    branches: [main]
-    paths:
-      - '.github/workflows/unity-package-ci.yml'
-      - 'Tools/CI/**'
-      - 'Tools/ProtocolGenerator/**'
-      - 'unity/**'
+    tags:
+      - '*'
 permissions:
   contents: read
 

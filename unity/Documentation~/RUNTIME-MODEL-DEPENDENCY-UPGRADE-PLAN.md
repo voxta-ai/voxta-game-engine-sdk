@@ -13,7 +13,7 @@ The public runtime uses `Voxta.Model.dll` directly for protocol messages and JSO
 - [x] No generated protocol DTO source is compiled or needed at runtime. The generated source was removed after clean package validation rebuilt `Voxta.Unity.Runtime.dll` and `Voxta.Unity.Runtime.Tests.dll` successfully on 2026-09-23.
 - [x] SignalR connections, device authorization, chat, action, microphone, and reply audio retain their current behavior. Verified in the BasicIntegration live-server run on 2026-09-23.
 - [x] Runtime and package-validation tests pass. The clean package-validation project reported 65 passed and 4 explicit live-server tests skipped; the sandbox validation reported 66 passed and 4 skipped after compiling the imported sample against `Voxta.Model`.
-- [ ] Windows Mono and Linux IL2CPP player builds pass in CI.
+- [x] Windows Mono and Linux IL2CPP player builds pass in CI. The hosted Unity package workflow passed both desktop builds on 2026-09-24.
 - [x] A live-server compatibility run confirms authentication, text, actions, audio playback, and microphone streaming. BasicIntegration verified device authorization and saved-token reuse, chat startup and text replies, the `wave` callback, authenticated spatial reply audio, and microphone capture/recording on 2026-09-23.
 
 ## Boundaries
@@ -82,7 +82,7 @@ The probe stores its build scene at `Compatibility~/RuntimeModelUnity2022Probe/A
 ## 6. Validate package delivery and release readiness
 
 - [x] Run the clean Unity package-validation project with the target DLL closure. Unity 2022.3.62f3 PlayMode validation discovered 69 tests: 65 passed, 0 failed, and 4 explicit live-server tests were skipped.
-- [ ] Run CI package tests, Windows Mono build, and Linux IL2CPP build. The workflow is configured for all three validations; a hosted run is pending.
+- [x] Run CI package tests, Windows Mono build, and Linux IL2CPP build. The hosted workflow passed all three validations on 2026-09-24; it runs for pull requests, manual dispatch, and pushed tags.
 - [ ] Verify build output contains exactly one intended `System.Text.Json` assembly and the expected SignalR/model assemblies. The workflow validates the Windows Mono player against the pinned hashes after the build; a hosted build is pending.
 - [x] Run the BasicIntegration sample against a compatible Voxta server: device flow, saved token reuse, text reply, `wave` action, authenticated reply-audio download, spatial playback, and microphone input. Verified in the sandbox live run on 2026-09-23.
 - [x] Review binary/package size and platform support changes for release notes. The managed closure changes from 27 DLLs / 2,461,632 bytes to 24 DLLs / 2,768,792 bytes (+307,160 bytes); it supports the Editor and standalone Windows, Linux, and macOS targets.
