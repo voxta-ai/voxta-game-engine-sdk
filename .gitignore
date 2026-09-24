@@ -123,3 +123,6 @@ InitTestScene*.unity*
 
 # JetBrains project metadata for the Unity package.
 /unity/.idea/
+
+# JetBrains project metadata.
+.idea/
