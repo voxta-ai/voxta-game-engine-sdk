@@ -3,7 +3,6 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
-using UnityEditor.TestTools.TestRunner.Api;
 using UnityEngine;
 
 namespace Voxta.CI
@@ -13,10 +12,6 @@ namespace Voxta.CI
         private const string PackageName = "com.voxta.game-engine-sdk";
         private const string ImportedSamplePath = "Assets/Samples/Voxta Game Engine SDK/Basic Chat Integration";
         private const string SampleScenePath = ImportedSamplePath + "/BasicIntegration.unity";
-        private const string PlayModeResultsPath = "../../artifacts/test-results/playmode-results.xml";
-
-        private static TestRunnerApi? _testRunnerApi;
-        private static PlayModeTestCallbacks? _playModeTestCallbacks;
 
         public static void ValidatePackageForTests()
         {
@@ -24,25 +19,6 @@ namespace Voxta.CI
             if (package == null || string.IsNullOrWhiteSpace(package.resolvedPath))
             {
                 throw new BuildFailedException($"UPM did not resolve {PackageName} from its Git dependency.");
-            }
-        }
-
-        public static void RunPlayModeTests()
-        {
-            ValidatePackageForTests();
-
-            try
-            {
-                _testRunnerApi = ScriptableObject.CreateInstance<TestRunnerApi>();
-                _playModeTestCallbacks = new PlayModeTestCallbacks();
-                _testRunnerApi.RegisterCallbacks(_playModeTestCallbacks);
-                Debug.Log("Starting package Play Mode tests.");
-                _testRunnerApi.Execute(new ExecutionSettings(new Filter { testMode = TestMode.PlayMode }));
-            }
-            catch (Exception exception)
-            {
-                Debug.LogException(exception);
-                EditorApplication.Exit(1);
             }
         }
 
@@ -116,48 +92,6 @@ namespace Voxta.CI
             }
 
             Debug.Log($"{outputDirectory} build succeeded at {report.summary.outputPath}.");
-        }
-
-        private sealed class PlayModeTestCallbacks : ICallbacks
-        {
-            public void RunStarted(ITestAdaptor testsToRun)
-            {
-                Debug.Log($"Running {testsToRun.TestCaseCount} package Play Mode tests.");
-            }
-
-            public void RunFinished(ITestResultAdaptor result)
-            {
-                try
-                {
-                    var resultsDirectory = Path.GetDirectoryName(PlayModeResultsPath);
-                    if (!string.IsNullOrWhiteSpace(resultsDirectory))
-                    {
-                        Directory.CreateDirectory(resultsDirectory);
-                    }
-
-                    TestRunnerApi.SaveResultToFile(result, PlayModeResultsPath);
-                    Debug.Log(
-                        $"Package Play Mode tests completed: total={result.TestCaseCount}, " +
-                        $"passed={result.PassCount}, failed={result.FailCount}, " +
-                        $"skipped={result.SkipCount}, inconclusive={result.InconclusiveCount}.");
-                    EditorApplication.Exit(result.FailCount == 0 ? 0 : 1);
-                }
-                catch (Exception exception)
-                {
-                    Debug.LogException(exception);
-                    EditorApplication.Exit(1);
-                }
-            }
-
-            public void TestStarted(ITestAdaptor test) { }
-
-            public void TestFinished(ITestResultAdaptor result)
-            {
-                if (!result.HasChildren && result.ResultState != "Passed")
-                {
-                    Debug.LogError($"Test failed: {result.Test.FullName}\n{result.Message}\n{result.StackTrace}");
-                }
-            }
         }
     }
 }

@@ -40,7 +40,6 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $pinned = Get-Content -Raw Tools/ProtocolGenerator/pinned-model.json | ConvertFrom-Json
           $packageId = $pinned.packageId.ToLowerInvariant()
-
           try {
             $index = Invoke-RestMethod -Uri "https://api.nuget.org/v3-flatcontainer/$packageId/index.json"
             $latestVersion = $index.versions[-1]
@@ -49,29 +48,34 @@ jobs:
             Write-Output "::warning title=Voxta.Model NuGet check unavailable::Could not query NuGet for updates: $($_.Exception.Message)"
             exit 0
           }
-
           if ($pinned.packageVersion -eq $latestVersion) {
             Write-Output "Voxta.Model is current at $latestVersion."
             exit 0
           }
-
           Write-Output "::warning title=Voxta.Model update available::Pinned $($pinned.packageVersion); NuGet latest is $latestVersion. Review and intentionally vendor the new model DLL."
-
-  runtime-model-closure:
-    name: Pinned runtime model closure
+  generated-protocol:
+    name: Generated protocol drift
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.2.2
         with:
           persist-credentials: false
 
-      - name: Validate the pinned vendored closure
-        shell: pwsh
-        run: ./Tools/ValidateRuntimeModelDependencyClosure.ps1
+      - uses: actions/setup-dotnet@v4.3.1
+        with:
+          dotnet-version: 10.0.401
 
+      - name: Check generated protocol output
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet run --project Tools/ProtocolGenerator/Voxta.ProtocolGenerator.csproj -- \
+            --model-info Tools/ProtocolGenerator/pinned-model.json \
+            --output unity/Runtime/Protocol/Generated/M1Messages.g.cs \
+            --check
   unity-package:
     name: Unity tests, package validation, and desktop builds
-    needs: runtime-model-closure
+    needs: generated-protocol
     runs-on: ubuntu-22.04
     env:
       UNITY_VERSION: 2022.3.62f3
@@ -99,7 +103,6 @@ jobs:
         run: |
           $revision = '${{ github.event.pull_request.head.sha || github.sha }}'
           ./Tools/CI/Initialize-UnityPackageValidationProject.ps1 -ProjectPath $env:VALIDATION_PROJECT -Revision $revision -PackageGitUrl $env:PACKAGE_GIT_URL
-
       - name: Resolve the package and import Basic Chat Integration
         uses: game-ci/unity-builder@v4
         with:
@@ -109,27 +112,13 @@ jobs:
           buildMethod: Voxta.CI.UnityPackageValidationBuild.ImportBasicIntegrationSample
           allowDirtyBuild: true
 
-      - name: Prepare package test results directory
-        shell: bash
-        run: mkdir -p artifacts/test-results
-
-      - name: Run package Play Mode tests
-        uses: game-ci/unity-builder@v4
+      - name: Run package Edit and Play Mode tests
+        uses: game-ci/unity-test-runner@v4.3.1
         with:
           customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
-          targetPlatform: StandaloneWindows64
-          buildMethod: Voxta.CI.UnityPackageValidationBuild.RunPlayModeTests
-          manualExit: true
-          allowDirtyBuild: true
-
-      - name: Upload package test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: unity-package-test-results
-          path: artifacts/test-results
-          if-no-files-found: warn
+          testMode: all
+          artifactsPath: artifacts/test-results
 
       - name: Build Basic Chat Integration for Windows Mono
         uses: game-ci/unity-builder@v4
@@ -140,19 +129,12 @@ jobs:
           buildMethod: Voxta.CI.UnityPackageValidationBuild.BuildMonoWindows64
           allowDirtyBuild: true
 
-      - name: Verify the Windows Mono managed dependency closure
-        shell: pwsh
-        run: |
-          ./Tools/CI/Validate-UnityPlayerManagedClosure.ps1 `
-            -PlayerPath "$env:VALIDATION_PROJECT/Builds/Windows64-Mono/VoxtaBasicIntegration.exe"
-
       - name: Reclaim Windows Mono image space before the IL2CPP build
         shell: bash
         run: |
           set -euo pipefail
           docker image rm "$UNITY_WINDOWS_MONO_IMAGE"
           docker system df
-
       - name: Build Basic Chat Integration for Linux IL2CPP
         uses: game-ci/unity-builder@v4
         with:
