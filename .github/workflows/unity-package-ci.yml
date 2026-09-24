@@ -109,13 +109,29 @@ jobs:
           buildMethod: Voxta.CI.UnityPackageValidationBuild.ImportBasicIntegrationSample
           allowDirtyBuild: true
 
-      - name: Run package Edit and Play Mode tests
-        uses: game-ci/unity-test-runner@v4.3.1
+      - name: Prepare package test results directory
+        shell: bash
+        run: mkdir -p artifacts/test-results
+
+      - name: Run package Play Mode tests
+        uses: game-ci/unity-builder@v4
         with:
           customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
-          testMode: all
-          artifactsPath: artifacts/test-results
+          targetPlatform: StandaloneWindows64
+          customParameters: >-
+            -runTests
+            -testPlatform PlayMode
+            -testResults /github/workspace/artifacts/test-results/playmode-results.xml
+          allowDirtyBuild: true
+
+      - name: Upload package test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unity-package-test-results
+          path: artifacts/test-results
+          if-no-files-found: warn
 
       - name: Build Basic Chat Integration for Windows Mono
         uses: game-ci/unity-builder@v4

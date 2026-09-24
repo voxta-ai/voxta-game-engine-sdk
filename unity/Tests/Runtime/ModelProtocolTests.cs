@@ -49,7 +49,7 @@ namespace Voxta.Unity.Tests
                 SessionId = sessionId,
                 Text = "Hello",
                 Role = ChatMessageRole.User
-            }, "sendMessage", payload =>
+            }, "send", payload =>
             {
                 Assert.That(payload.GetProperty("role").GetString(), Is.EqualTo("User"));
             });
