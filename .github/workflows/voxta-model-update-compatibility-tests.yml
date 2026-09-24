@@ -1,0 +1,162 @@
+name: Voxta.Model update-compatiblity tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_version:
+        description: Specific Voxta.Model version to validate instead of NuGet latest
+        required: false
+        type: string
+  schedule:
+    - cron: '23 5 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: voxta-model-compatibility-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  candidate-compatibility:
+    name: Candidate model compatibility
+    runs-on: ubuntu-22.04
+    env:
+      UNITY_VERSION: 2022.3.62f3
+      UNITY_WINDOWS_MONO_IMAGE: unityci/editor:ubuntu-2022.3.62f3-windows-mono-3.2.2
+      UNITY_LINUX_IL2CPP_IMAGE: unityci/editor:ubuntu-2022.3.62f3-linux-il2cpp-3.2.2
+      VALIDATION_PROJECT: .ci/UnityPackageValidation
+      CANDIDATE_PACKAGE: .ci/VoxtaModelCandidatePackage
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Find a candidate Voxta.Model package
+        id: model
+        shell: pwsh
+        env:
+          REQUESTED_VERSION: ${{ inputs.candidate_version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $pinned = Get-Content -Raw Tools/ProtocolGenerator/pinned-model.json | ConvertFrom-Json
+          $candidate = $env:REQUESTED_VERSION
+
+          if (-not $candidate) {
+            $packageId = $pinned.packageId.ToLowerInvariant()
+            try {
+              $index = Invoke-RestMethod -Uri "https://api.nuget.org/v3-flatcontainer/$packageId/index.json"
+              $candidate = $index.versions[-1]
+            }
+            catch {
+              Write-Output "::warning title=Voxta.Model NuGet check unavailable::Could not query NuGet for updates: $($_.Exception.Message)"
+              "candidate=false" >> $env:GITHUB_OUTPUT
+              exit 0
+            }
+          }
+
+          if ($candidate -eq $pinned.packageVersion) {
+            Write-Output "Voxta.Model is current at $candidate."
+            "candidate=false" >> $env:GITHUB_OUTPUT
+            exit 0
+          }
+
+          Write-Output "Testing Voxta.Model $candidate against pinned $($pinned.packageVersion)."
+          "candidate=true" >> $env:GITHUB_OUTPUT
+          "version=$candidate" >> $env:GITHUB_OUTPUT
+          "## Voxta.Model candidate`nTesting `$candidate` against pinned `$($pinned.packageVersion)`." >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Create isolated candidate package
+        if: steps.model.outputs.candidate == 'true'
+        shell: pwsh
+        env:
+          CANDIDATE_VERSION: ${{ steps.model.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packageId = 'voxta.model'
+          $archive = Join-Path $env:RUNNER_TEMP "$packageId.$env:CANDIDATE_VERSION.nupkg"
+          $expanded = Join-Path $env:RUNNER_TEMP "voxta-model-$env:CANDIDATE_VERSION"
+          $url = "https://api.nuget.org/v3-flatcontainer/$packageId/$env:CANDIDATE_VERSION/$packageId.$env:CANDIDATE_VERSION.nupkg"
+
+          Copy-Item -LiteralPath unity -Destination $env:CANDIDATE_PACKAGE -Recurse
+          Invoke-WebRequest -Uri $url -OutFile $archive
+          Expand-Archive -LiteralPath $archive -DestinationPath $expanded -Force
+
+          $candidateAssembly = Join-Path $expanded 'lib/netstandard2.1/Voxta.Model.dll'
+          if (-not (Test-Path -LiteralPath $candidateAssembly -PathType Leaf)) {
+            throw "Voxta.Model $env:CANDIDATE_VERSION has no lib/netstandard2.1/Voxta.Model.dll asset."
+          }
+
+          Copy-Item -LiteralPath $candidateAssembly -Destination (Join-Path $env:CANDIDATE_PACKAGE 'Runtime/Plugins/ThirdParty/Voxta.Model.dll') -Force
+          Write-Output "Prepared isolated package with Voxta.Model $env:CANDIDATE_VERSION."
+
+      - name: Create candidate validation project
+        if: steps.model.outputs.candidate == 'true'
+        shell: pwsh
+        run: |
+          ./Tools/CI/Initialize-UnityPackageValidationProject.ps1 `
+            -ProjectPath $env:VALIDATION_PROJECT `
+            -Revision '${{ github.sha }}' `
+            -PackagePath '../../VoxtaModelCandidatePackage'
+
+      - name: Resolve candidate package and import Basic Chat Integration
+        if: steps.model.outputs.candidate == 'true'
+        uses: game-ci/unity-builder@v4
+        with:
+          customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
+          projectPath: ${{ env.VALIDATION_PROJECT }}
+          targetPlatform: StandaloneWindows64
+          buildMethod: Voxta.CI.UnityPackageValidationBuild.ImportBasicIntegrationSample
+          allowDirtyBuild: true
+
+      - name: Run candidate package Edit and Play Mode tests
+        if: steps.model.outputs.candidate == 'true'
+        uses: game-ci/unity-test-runner@v4.3.1
+        with:
+          customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
+          projectPath: ${{ env.VALIDATION_PROJECT }}
+          testMode: all
+          artifactsPath: artifacts/candidate-test-results
+
+      - name: Build candidate Basic Chat Integration for Windows Mono
+        if: steps.model.outputs.candidate == 'true'
+        uses: game-ci/unity-builder@v4
+        with:
+          customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
+          projectPath: ${{ env.VALIDATION_PROJECT }}
+          targetPlatform: StandaloneWindows64
+          buildMethod: Voxta.CI.UnityPackageValidationBuild.BuildMonoWindows64
+          allowDirtyBuild: true
+
+      - name: Reclaim Windows Mono image space before the candidate IL2CPP build
+        if: steps.model.outputs.candidate == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker image rm "$UNITY_WINDOWS_MONO_IMAGE"
+          docker system df
+
+      - name: Build candidate Basic Chat Integration for Linux IL2CPP
+        if: steps.model.outputs.candidate == 'true'
+        uses: game-ci/unity-builder@v4
+        with:
+          customImage: ${{ env.UNITY_LINUX_IL2CPP_IMAGE }}
+          projectPath: ${{ env.VALIDATION_PROJECT }}
+          targetPlatform: StandaloneLinux64
+          buildMethod: Voxta.CI.UnityPackageValidationBuild.BuildIl2CppLinux64
+          allowDirtyBuild: true
+
+      - name: Upload candidate Unity results and players
+        if: always() && steps.model.outputs.candidate == 'true'
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: voxta-model-compatibility-${{ steps.model.outputs.version }}-${{ github.run_id }}
+          if-no-files-found: warn
+          path: |
+            artifacts/candidate-test-results
+            ${{ env.VALIDATION_PROJECT }}/Builds
+            ${{ env.VALIDATION_PROJECT }}/Logs

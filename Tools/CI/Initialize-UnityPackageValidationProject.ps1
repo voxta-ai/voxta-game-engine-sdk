@@ -9,6 +9,8 @@ param(
 
     [string]$PackageGitUrl = 'https://github.com/voxta-ai/voxta-game-engine-sdk.git',
 
+    [string]$PackagePath,
+
     [string]$BuildScriptPath = (Join-Path $PSScriptRoot 'UnityPackageValidationBuild.cs')
 )
 
@@ -22,6 +24,17 @@ if (-not (Test-Path -LiteralPath $BuildScriptPath -PathType Leaf)) {
     throw "Unity build script was not found: $BuildScriptPath"
 }
 
+if ($PackagePath -and $PSBoundParameters.ContainsKey('PackageGitUrl')) {
+    throw 'Specify either PackageGitUrl or PackagePath, not both.'
+}
+
+$packageDependency = if ($PackagePath) {
+    "file:$PackagePath"
+}
+else {
+    "${PackageGitUrl}?path=unity#${Revision}"
+}
+
 $assetsPath = Join-Path $ProjectPath 'Assets'
 $packagesPath = Join-Path $ProjectPath 'Packages'
 $projectSettingsPath = Join-Path $ProjectPath 'ProjectSettings'
@@ -32,7 +45,7 @@ New-Item -ItemType Directory -Force $editorPath, $packagesPath, $projectSettings
 $manifest = @{
     dependencies = @{
         'com.unity.test-framework' = '1.1.33'
-        'com.voxta.game-engine-sdk' = "${PackageGitUrl}?path=unity#${Revision}"
+        'com.voxta.game-engine-sdk' = $packageDependency
     }
     testables = @('com.voxta.game-engine-sdk')
 }

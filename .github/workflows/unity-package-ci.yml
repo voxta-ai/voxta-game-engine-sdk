@@ -15,9 +15,6 @@ on:
       - 'Tools/CI/**'
       - 'Tools/ProtocolGenerator/**'
       - 'unity/**'
-  schedule:
-    - cron: '23 5 * * *'
-
 permissions:
   contents: read
 
