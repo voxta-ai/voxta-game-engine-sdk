@@ -43,7 +43,7 @@ jobs:
           REQUESTED_VERSION: ${{ inputs.candidate_version }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $pinned = Get-Content -Raw Tools/ProtocolGenerator/pinned-model.json | ConvertFrom-Json
+          $pinned = Get-Content -Raw Tools/ModelDependencies/VoxtaModel/pinned-model.json | ConvertFrom-Json
           $candidate = $env:REQUESTED_VERSION
 
           if (-not $candidate) {
@@ -98,7 +98,7 @@ jobs:
         if: steps.model.outputs.candidate == 'true'
         shell: pwsh
         run: |
-          ./Tools/CI/Initialize-UnityPackageValidationProject.ps1 `
+          ./Tools/UnityValidation/Initialize-UnityPackageValidationProject.ps1 `
             -ProjectPath $env:VALIDATION_PROJECT `
             -Revision '${{ github.sha }}' `
             -PackagePath '../../VoxtaModelCandidatePackage'

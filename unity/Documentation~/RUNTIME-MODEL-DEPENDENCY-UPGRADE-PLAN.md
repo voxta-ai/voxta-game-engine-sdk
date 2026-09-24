@@ -1,4 +1,4 @@
-﻿# Runtime `Voxta.Model` Dependency Upgrade Plan
+# Runtime `Voxta.Model` Dependency Upgrade Plan
 
 **Status:** Proposed  
 **Package root:** `unity/`  
@@ -18,8 +18,8 @@ The public runtime uses `Voxta.Model.dll` directly for protocol messages and JSO
 
 ## Boundaries
 
-- [ ] Keep the vendored model package version explicitly pinned; do not dynamically restore NuGet packages in Unity projects or consumer CI.
-- [ ] Retain the protocol generator only until the runtime migration is complete, then decide whether to remove it or retain it for contract inspection/tests.
+- [x] Keep the vendored model package version explicitly pinned; do not dynamically restore NuGet packages in Unity projects or consumer CI.
+- [x] Remove the obsolete protocol generator after the runtime migration. The former generator source and its generated DTO output were deleted; the model pin and closure audit remain under `Tools/ModelDependencies/VoxtaModel/`.
 - [ ] Do not mix assemblies from SignalR 8 and SignalR 10 in the shipped package.
 - [ ] Do not replace only `System.Text.Json.dll`; every assembly in the transitive closure must be selected and tested together.
 - [ ] Keep the existing non-blocking NuGet-version notice. A newer model version remains an intentional update, not an automatic runtime upgrade.
@@ -59,7 +59,7 @@ The probe stores its build scene at `Compatibility~/RuntimeModelUnity2022Probe/A
 - [x] Move `Voxta.Model.dll` from its disabled generator-only import configuration to the runtime plugin configuration.
 - [x] Update plugin `.meta` files so required runtime DLLs are enabled and generator-only tooling assets remain excluded from Unity as appropriate.
 - [x] Add or update a repeatable maintenance script that validates the vendored filenames, versions, and hashes without restoring them at consumer build time.
-- [x] Extend CI to verify that inventory before Unity tests run. The `runtime-model-closure` workflow job runs `Tools/ValidateRuntimeModelDependencyClosure.ps1` before the Unity package job.
+- [x] Add an upstream-model compatibility canary. The scheduled `voxta-model-update-compatibility-tests.yml` workflow tests a newer `Voxta.Model` DLL in an isolated package without changing the production pin.
 
 ## 4. Replace generated DTO use with model types
 
@@ -76,7 +76,7 @@ The probe stores its build scene at `Compatibility~/RuntimeModelUnity2022Probe/A
 - [x] Rewrite generated-protocol tests as model compatibility tests: discriminator values, representative deserialization, enum handling, optional fields, and unknown-message behavior. `ModelProtocolTests` uses `Voxta.Model` and `VoxtaJsonSerializer.CreateSerializeOptions()`; `TransportTests` verifies unknown frames are ignored while malformed `action` frames report errors.
 - [x] Retain coverage for authentication, chat lifecycle, actions, device authorization, speech lifecycle, and microphone protocol frames using model types. Runtime tests cover the device-code and token flow, model chat/action/speech messages, microphone stream endpoint and PCM frames; BasicIntegration covers the model `wave` definition. The 2026-09-23 live run additionally verified the explicit device-approval, text/action, reply-audio, and microphone paths.
 - [x] Add regression tests that verify `System.Text.Json` 10 serialization sends the same wire frames required by the pinned server contract. `ModelProtocolTests.SdkEmittedFramesUsePinnedDiscriminatorsAndStringEnums` covers every SignalR client frame emitted by the SDK, including polymorphic `$type` output and string enum values.
-- [x] Add a test that fails when an accidental SignalR 8 / JSON 8 DLL is introduced alongside the target closure. `Tools/ValidateRuntimeModelDependencyClosure.ps1` rejects assembly identities at major version 8 and requires the inventory's SignalR/JSON assets to be major version 10.
+- [x] Add a test that fails when an accidental SignalR 8 / JSON 8 DLL is introduced alongside the target closure. `Tools/ModelDependencies/VoxtaModel/Validate-VoxtaModelDependencyClosure.ps1` rejects assembly identities at major version 8 and requires the inventory's SignalR/JSON assets to be major version 10.
 - [x] Keep live-server and device-approval tests explicit; run them before declaring the migration complete. The four live-server tests remain explicit/skipped by default; the 2026-09-23 BasicIntegration run completed device approval and saved-token reuse, chat/text, `wave`, authenticated spatial reply audio, and microphone recording.
 
 ## 6. Validate package delivery and release readiness

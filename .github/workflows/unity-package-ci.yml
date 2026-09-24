@@ -5,8 +5,8 @@ on:
   pull_request:
     paths:
       - '.github/workflows/unity-package-ci.yml'
-      - 'Tools/CI/**'
-      - 'Tools/ProtocolGenerator/**'
+      - 'Tools/UnityValidation/**'
+      - 'Tools/ModelDependencies/VoxtaModel/**'
       - 'unity/**'
   push:
     tags:
@@ -31,7 +31,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $pinned = Get-Content -Raw Tools/ProtocolGenerator/pinned-model.json | ConvertFrom-Json
+          $pinned = Get-Content -Raw Tools/ModelDependencies/VoxtaModel/pinned-model.json | ConvertFrom-Json
           $packageId = $pinned.packageId.ToLowerInvariant()
           try {
             $index = Invoke-RestMethod -Uri "https://api.nuget.org/v3-flatcontainer/$packageId/index.json"
@@ -74,7 +74,7 @@ jobs:
         shell: pwsh
         run: |
           $revision = '${{ github.event.pull_request.head.sha || github.sha }}'
-          ./Tools/CI/Initialize-UnityPackageValidationProject.ps1 -ProjectPath $env:VALIDATION_PROJECT -Revision $revision -PackageGitUrl $env:PACKAGE_GIT_URL
+          ./Tools/UnityValidation/Initialize-UnityPackageValidationProject.ps1 -ProjectPath $env:VALIDATION_PROJECT -Revision $revision -PackageGitUrl $env:PACKAGE_GIT_URL
       - name: Resolve the package and import Basic Chat Integration
         uses: game-ci/unity-builder@v4
         with:
