@@ -1,5 +1,9 @@
 using System;
+using System.Reflection;
+using System.Text.Json;
 using NUnit.Framework;
+using Voxta.Model.WebsocketMessages.ClientMessages;
+using Voxta.Model.WebsocketMessages.ServerMessages;
 using Voxta.Unity.Transport;
 
 namespace Voxta.Unity.Tests
@@ -30,6 +34,66 @@ namespace Voxta.Unity.Tests
             var sessionId = Guid.Parse("11111111-2222-3333-4444-555555555555");
             var result = VoxtaWebsocketUrl.ToAudioInputStreamUri(new Uri("https://example.test/base/"), sessionId);
             Assert.That(result.AbsoluteUri, Is.EqualTo("wss://example.test/base/ws/audio/input/stream?sessionId=11111111-2222-3333-4444-555555555555"));
+        }
+
+        [Test]
+        public void UnknownTransportFrameIsIgnoredAndLaterKnownFramesAreDelivered()
+        {
+            var transport = new VoxtaSignalRTransport(
+                new Uri("http://localhost:5384"),
+                null,
+                new ClientAuthenticateMessage { Client = "test", ClientVersion = "1.0" });
+            var received = 0;
+            Exception error = null;
+            transport.MessageReceived += _ => received++;
+            transport.Error += value => error = value;
+
+            try
+            {
+                InvokeReceiveMessage(transport, "{\"$type\":\"futureServerFrame\"}");
+                UnityMainThreadDispatcher.DrainPending();
+                Assert.That(received, Is.Zero);
+                Assert.That(error, Is.Null);
+
+                InvokeReceiveMessage(transport, "{\"$type\":\"speechRecognitionStart\"}");
+                UnityMainThreadDispatcher.DrainPending();
+                Assert.That(received, Is.EqualTo(1));
+            }
+            finally
+            {
+                transport.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            }
+        }
+
+        [Test]
+        public void MalformedActionFrameReportsAnError()
+        {
+            var transport = new VoxtaSignalRTransport(
+                new Uri("http://localhost:5384"),
+                null,
+                new ClientAuthenticateMessage { Client = "test", ClientVersion = "1.0" });
+            Exception error = null;
+            transport.Error += value => error = value;
+
+            try
+            {
+                InvokeReceiveMessage(transport, "{\"$type\":\"action\",\"sessionId\":false}");
+                UnityMainThreadDispatcher.DrainPending();
+
+                Assert.That(error, Is.TypeOf<JsonException>());
+            }
+            finally
+            {
+                transport.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            }
+        }
+
+        private static void InvokeReceiveMessage(VoxtaSignalRTransport transport, string json)
+        {
+            using var document = JsonDocument.Parse(json);
+            typeof(VoxtaSignalRTransport)
+                .GetMethod("HandleReceiveMessage", BindingFlags.Instance | BindingFlags.NonPublic)
+                .Invoke(transport, new object[] { document.RootElement });
         }
     }
 }

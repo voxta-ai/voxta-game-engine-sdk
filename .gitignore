@@ -107,3 +107,18 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Compatibility probes are Unity projects nested below the package. Keep their
+# source fixtures, but exclude Unity-generated caches, players, and IDE files.
+/unity/Compatibility~/**/.idea/
+/unity/Compatibility~/**/.unity/
+/unity/Compatibility~/**/[Ll]ibrary/
+/unity/Compatibility~/**/[Ll]ogs/
+/unity/Compatibility~/**/[Uu]ser[Ss]ettings/
+/unity/Compatibility~/**/[Tt]est[Rr]esults/
+/unity/Compatibility~/**/[Bb]uilds/
+/unity/Compatibility~/**/*.csproj
+/unity/Compatibility~/**/*.sln
+/unity/Compatibility~/**/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+/unity/Documentation~/RuntimeModelDependencyProbe/bin/
+/unity/Documentation~/RuntimeModelDependencyProbe/obj/

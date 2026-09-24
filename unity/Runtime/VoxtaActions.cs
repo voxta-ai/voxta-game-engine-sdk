@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Voxta.Unity.Protocol.Generated;
+using Voxta.Model.Shared;
+using Voxta.Model.WebsocketMessages.ClientMessages;
+using Voxta.Model.WebsocketMessages.ServerMessages;
 
 namespace Voxta.Unity
 {

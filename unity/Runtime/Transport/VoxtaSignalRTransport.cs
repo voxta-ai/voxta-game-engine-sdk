@@ -6,7 +6,9 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
-using Voxta.Unity.Protocol.Generated;
+using Voxta.Model.Serialization;
+using Voxta.Model.WebsocketMessages.ClientMessages;
+using Voxta.Model.WebsocketMessages.ServerMessages;
 
 namespace Voxta.Unity.Transport
 {
@@ -52,7 +54,7 @@ namespace Voxta.Unity.Transport
                     options.SkipNegotiation = true;
                 })
                 .WithAutomaticReconnect(new VoxtaRetryPolicy())
-                .AddJsonProtocol(options => options.PayloadSerializerOptions = VoxtaJson.CreateOptions())
+                .AddJsonProtocol(options => options.PayloadSerializerOptions = VoxtaJsonSerializer.CreateSerializeOptions())
                 .Build();
 
             connection.On<JsonElement>("ReceiveMessage", HandleReceiveMessage);
@@ -100,7 +102,7 @@ namespace Voxta.Unity.Transport
         {
             try
             {
-                var message = JsonSerializer.Deserialize<ServerMessage>(payload.GetRawText(), VoxtaJson.CreateOptions());
+                var message = JsonSerializer.Deserialize<ServerMessage>(payload.GetRawText(), VoxtaJsonSerializer.CreateSerializeOptions());
                 if (message == null) return;
                 UnityMainThreadDispatcher.Post(() => MessageReceived?.Invoke(message));
             }

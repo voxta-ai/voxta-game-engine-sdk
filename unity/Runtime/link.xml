@@ -6,5 +6,7 @@
   <assembly fullname="Microsoft.AspNetCore.Http.Connections.Client" preserve="all" />
   <assembly fullname="Microsoft.AspNetCore.Http.Connections.Common" preserve="all" />
   <assembly fullname="System.Text.Json" preserve="all" />
+  <!-- Voxta.Model uses attribute-based polymorphic JSON metadata. -->
+  <assembly fullname="Voxta.Model" preserve="all" />
   <assembly fullname="Voxta.Unity.Runtime" preserve="all" />
 </linker>

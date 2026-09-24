@@ -1,6 +1,6 @@
 ﻿{
   "name": "com.voxta.game-engine-sdk",
-  "version": "0.1.0-pre.1",
+  "version": "0.1.0-pre.2",
   "displayName": "Voxta Game Engine SDK",
   "description": "The official Unity integration for the Voxta server. Includes runtime components for voice processing, networking, and context management.",
   "unity": "2022.3",

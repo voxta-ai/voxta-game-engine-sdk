@@ -1,5 +1,5 @@
-﻿fileFormatVersion: 2
-guid: 00d18a1945f39d58a74c4955f88fe0ea
+fileFormatVersion: 2
+guid: fce2fb9172b02984bb4e1a5dc1008b65
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -14,7 +14,7 @@ PluginImporter:
   - first:
       Any:
     second:
-      enabled: 1
+      enabled: 0
       settings: {}
   - first:
       Editor: Editor
@@ -22,6 +22,21 @@ PluginImporter:
       enabled: 1
       settings:
         DefaultValueInitialized: true
+  - first:
+      Standalone: Linux64
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Standalone: OSXUniversal
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Standalone: Win64
+    second:
+      enabled: 1
+      settings: {}
   - first:
       Windows Store Apps: WindowsStoreApps
     second:
@@ -31,7 +46,3 @@ PluginImporter:
   userData:
   assetBundleName:
   assetBundleVariant:
-
-
-
-

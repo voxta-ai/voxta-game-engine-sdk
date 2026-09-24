@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using Voxta.Unity.Protocol.Generated;
+using Voxta.Model.WebsocketMessages.ServerMessages;
 using Voxta.Unity.Transport;
 
 namespace Voxta.Unity

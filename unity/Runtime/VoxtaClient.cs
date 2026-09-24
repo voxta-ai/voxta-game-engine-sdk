@@ -1,7 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Voxta.Unity.Protocol.Generated;
+using Voxta.Model.Shared;
+using Voxta.Model.WebsocketMessages.ClientMessages;
+using Voxta.Model.WebsocketMessages.ServerMessages;
 using Voxta.Unity.Transport;
 
 namespace Voxta.Unity
@@ -28,8 +30,11 @@ namespace Voxta.Unity
             transport = new VoxtaSignalRTransport(serverUrl, accessToken, new ClientAuthenticateMessage
             {
                 Client = "Voxta Unity SDK",
-                ClientVersion = "0.1.0-pre.1",
-                Capabilities = capabilities ?? new ClientCapabilities()
+                ClientVersion = "0.1.0-pre.2",
+                Capabilities = capabilities ?? new ClientCapabilities
+                {
+                    AcceptedAudioContentTypes = new[] { "audio/x-wav" }
+                }
             });
             transport.MessageReceived += HandleMessage;
             transport.Error += HandleError;

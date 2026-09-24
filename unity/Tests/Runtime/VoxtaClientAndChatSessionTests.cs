@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Voxta.Unity.Protocol.Generated;
+using Voxta.Model.Shared;
+using Voxta.Model.WebsocketMessages.ClientMessages;
+using Voxta.Model.WebsocketMessages.ServerMessages;
 using Voxta.Unity.Transport;
 
 namespace Voxta.Unity.Tests

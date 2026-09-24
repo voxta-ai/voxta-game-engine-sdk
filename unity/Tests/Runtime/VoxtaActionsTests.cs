@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Voxta.Unity.Protocol.Generated;
+using Voxta.Model.Shared;
+using Voxta.Model.WebsocketMessages.ClientMessages;
+using Voxta.Model.WebsocketMessages.ServerMessages;
 using Voxta.Unity.Transport;
 
 namespace Voxta.Unity.Tests
@@ -146,13 +148,13 @@ namespace Voxta.Unity.Tests
                     SessionId = sessionId,
                     TriggerId = triggerId,
                     Name = "setMood",
-                    Arguments = new[] { JsonSerializer.Deserialize<JsonElement>("\"happy\"") }
+                    Arguments = new object[] { JsonSerializer.Deserialize<JsonElement>("\"happy\"") }
                 });
 
                 UnityMainThreadDispatcher.DrainPending();
 
                 Assert.That(received.Name, Is.EqualTo("setMood"));
-                Assert.That(received.Arguments[0].GetString(), Is.EqualTo("happy"));
+                Assert.That(((System.Text.Json.JsonElement)received.Arguments[0]).GetString(), Is.EqualTo("happy"));
                 Assert.That(callbackThread, Is.EqualTo(Thread.CurrentThread.ManagedThreadId));
                 var completion = transport.Sent.Find(message => message is ClientAppTriggerCompleteMessage) as ClientAppTriggerCompleteMessage;
                 Assert.That(completion, Is.Not.Null);
@@ -202,7 +204,7 @@ namespace Voxta.Unity.Tests
                 session.AnimationPlayReceived += value => animation = value;
                 session.ActionErrorReceived += value => error = value;
                 transport.Receive(new ServerChatStartedMessage { SessionId = sessionId, ChatId = Guid.NewGuid() });
-                transport.Receive(new ServerContextUpdatedMessage { SessionId = sessionId, Flags = Array.Empty<FlagInfo>(), Characters = Array.Empty<ChatParticipantInfo>(), Roles = new Dictionary<string, RoleEntry>() });
+                transport.Receive(new ServerContextUpdatedMessage { SessionId = sessionId, Flags = Array.Empty<FlagInfo>(), Characters = Array.Empty<ChatParticipantInfo>(), Roles = new Dictionary<string, ServerContextUpdatedMessage.RoleEntry>() });
                 transport.Receive(new ServerAnimationPlayMessage { SessionId = sessionId, AnimationId = Guid.NewGuid(), Url = "/animation", ContentType = "application/json" });
                 transport.Receive(new ServerChatSessionErrorMessage { SessionId = sessionId, Message = "Action failed.", Retry = false });
                 transport.Receive(new ServerAnimationPlayMessage { SessionId = Guid.NewGuid(), AnimationId = Guid.NewGuid(), Url = "/other", ContentType = "application/json" });
@@ -238,7 +240,7 @@ namespace Voxta.Unity.Tests
                 companion.OnContextUpdated.AddListener(value => contextUnityEvent = value);
                 companion.OnAnimationPlay.AddListener(value => animationUnityEvent = value);
                 companion.OnActionError.AddListener(value => errorUnityEvent = value);
-                var context = new ServerContextUpdatedMessage { Flags = Array.Empty<FlagInfo>(), Characters = Array.Empty<ChatParticipantInfo>(), Roles = new Dictionary<string, RoleEntry>() };
+                var context = new ServerContextUpdatedMessage { Flags = Array.Empty<FlagInfo>(), Characters = Array.Empty<ChatParticipantInfo>(), Roles = new Dictionary<string, ServerContextUpdatedMessage.RoleEntry>() };
                 var animation = new ServerAnimationPlayMessage { AnimationId = Guid.NewGuid(), Url = "/animation", ContentType = "application/json" };
                 var error = new ServerChatSessionErrorMessage { Message = "Action failed." };
 
@@ -480,9 +482,9 @@ namespace Voxta.Unity.Tests
                 Assert.That(received.TriggerId, Is.Not.Null, "The scenario must use chat.Queue.AppTrigger so the server requires an acknowledgement.");
                 Assert.That(received.Name, Is.EqualTo("unity_m4_app_trigger_probe"));
                 Assert.That(received.Arguments, Has.Length.EqualTo(3));
-                Assert.That(received.Arguments[0].GetString(), Is.EqualTo("hello"));
-                Assert.That(received.Arguments[1].GetInt32(), Is.EqualTo(7));
-                Assert.That(received.Arguments[2].GetBoolean(), Is.True);
+                Assert.That(((System.Text.Json.JsonElement)received.Arguments[0]).GetString(), Is.EqualTo("hello"));
+                Assert.That(((System.Text.Json.JsonElement)received.Arguments[1]).GetInt32(), Is.EqualTo(7));
+                Assert.That(((System.Text.Json.JsonElement)received.Arguments[2]).GetBoolean(), Is.True);
                 Assert.That(callbackThread, Is.EqualTo(Thread.CurrentThread.ManagedThreadId));
 
                 // The queued foreground trigger has been acknowledged by the session before this callback returns.

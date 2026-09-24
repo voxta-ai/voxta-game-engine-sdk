@@ -1,0 +1,242 @@
+﻿[
+    {
+        "packageId":  "Microsoft.AspNetCore.Connections.Abstractions",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.connections.abstractions/10.0.12/microsoft.aspnetcore.connections.abstractions.10.0.12.nupkg",
+        "packageSha512":  "pP5CXSG//gboXUGrgRrrfWxEWJQ1DJLbTo5BulmPp+GaiWf/KbjCCujWlkh7rPTBSWAP+5s4KXti3JAF5akdxA==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.1/Microsoft.AspNetCore.Connections.Abstractions.dll",
+        "assembly":  "Microsoft.AspNetCore.Connections.Abstractions.dll",
+        "assemblySha512":  "B36088F8DE4035301B572E37A568F590BE4ADEA1475CB2BE591DB2D772500F04A233EF059B393ECA115519D787E5BEFAA8FBBB47D76C9C681E1809E1F5C0EBD6"
+    },
+    {
+        "packageId":  "Microsoft.AspNetCore.Http.Connections.Client",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.connections.client/10.0.12/microsoft.aspnetcore.http.connections.client.10.0.12.nupkg",
+        "packageSha512":  "HEO648tD8OyX6aUNQwJSl1eKQk5eQChuHTqpybv2ep7/518/M27yeDDFxAh2M/LW+22tbbooao6raNEHm7lBhA==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.1/Microsoft.AspNetCore.Http.Connections.Client.dll",
+        "assembly":  "Microsoft.AspNetCore.Http.Connections.Client.dll",
+        "assemblySha512":  "32D9BAF8638DEC5DAC10DB43C92EE5FDFCEC3D42CC57F5D5DF315C423037003B39591E64F928A8C348FB6CF1B9B665EDF2DDBE03B28BD0D6E5967E81D28D7DFA"
+    },
+    {
+        "packageId":  "Microsoft.AspNetCore.Http.Connections.Common",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.http.connections.common/10.0.12/microsoft.aspnetcore.http.connections.common.10.0.12.nupkg",
+        "packageSha512":  "EyxNhHve9DXcRgbVGFdx14738QULLUREvDLHS/q9m28bwrBMMeZRnwNQcszowCuHt2cgKnYDwJwUaAJgByiigQ==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/Microsoft.AspNetCore.Http.Connections.Common.dll",
+        "assembly":  "Microsoft.AspNetCore.Http.Connections.Common.dll",
+        "assemblySha512":  "51079107DD222AA48FE28DAB9F227D6A0C9D8F96F6453D942797A8DD66C47D2C54D4A58246FDD8E927F1BC40D6F00B101358EE160A12E8654193E74A2BB4E57B"
+    },
+    {
+        "packageId":  "Microsoft.AspNetCore.SignalR.Client.Core",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.signalr.client.core/10.0.12/microsoft.aspnetcore.signalr.client.core.10.0.12.nupkg",
+        "packageSha512":  "+kCyWCOvZteBkqfbpmoi+ejIR1XVJOY4ydDNYrYt1WdXv/ruJS4WjDfCizGZ5lvn/OmRdMuVdh8opopbNveQcw==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.1/Microsoft.AspNetCore.SignalR.Client.Core.dll",
+        "assembly":  "Microsoft.AspNetCore.SignalR.Client.Core.dll",
+        "assemblySha512":  "9BA46D7171673F3DEF429719EC9C505ACD95BFE0F62E3C085B7ADF40F9737C31C742166E7C28C716256AEF3659CB6DC0C7E9C3007DD5E31FCD37469E836B0EE7"
+    },
+    {
+        "packageId":  "Microsoft.AspNetCore.SignalR.Client",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.signalr.client/10.0.12/microsoft.aspnetcore.signalr.client.10.0.12.nupkg",
+        "packageSha512":  "p5EFZrp20HlS1MbYkreyhHy4nXeq/LrXVLWbQLBuAz2eFCdSnKfoNVlxZYbFoEjzJxa68CYdEFe9ObCaYTUP8Q==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/Microsoft.AspNetCore.SignalR.Client.dll",
+        "assembly":  "Microsoft.AspNetCore.SignalR.Client.dll",
+        "assemblySha512":  "82937730FA2F0323616E28B3E101E502392FF85A95D7E6021D85AB3ADB78E147F63B72C69BC05554E0357DD158038EAE4CF23F0BC2F011C14CB84E5145352842"
+    },
+    {
+        "packageId":  "Microsoft.AspNetCore.SignalR.Common",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.signalr.common/10.0.12/microsoft.aspnetcore.signalr.common.10.0.12.nupkg",
+        "packageSha512":  "7DDVLxtjLtBBfle9RxZhiYc0PTSD4rc0SV4FZiT3Tdz6NxlrcnPqcGWME9Mc0PtbQ+X5GSgyPeyjGfA/tSfG8A==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/Microsoft.AspNetCore.SignalR.Common.dll",
+        "assembly":  "Microsoft.AspNetCore.SignalR.Common.dll",
+        "assemblySha512":  "99F7AAD3270111BEDFABE2958058CB1F5772E2CA1494DC335FFEB2B2ABB3E4EE7DD28FD6686687B81E14CAD7A3866996B7A1F83AEEA6A6878E13F290E4771F98"
+    },
+    {
+        "packageId":  "Microsoft.AspNetCore.SignalR.Protocols.Json",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.aspnetcore.signalr.protocols.json/10.0.12/microsoft.aspnetcore.signalr.protocols.json.10.0.12.nupkg",
+        "packageSha512":  "NVG8jfnuS850Cu4axdURINdArwKn/N+OyaA6A8/ERyWdflMMLFF25ZSEzAMnMD81rwNaPTVngTq0fE2xbuRwLQ==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/Microsoft.AspNetCore.SignalR.Protocols.Json.dll",
+        "assembly":  "Microsoft.AspNetCore.SignalR.Protocols.Json.dll",
+        "assemblySha512":  "D8B062C74883467885FADEC223CE5782D853D40748C4E5156554FC7D9E881C2C40EF3EB1F7675DD91ADB2C9F3EEDD2A7D323616882CAA3A050DEC90D1C635405"
+    },
+    {
+        "packageId":  "Microsoft.Bcl.AsyncInterfaces",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.bcl.asyncinterfaces/10.0.12/microsoft.bcl.asyncinterfaces.10.0.12.nupkg",
+        "packageSha512":  "vHPomsJPqUvf1ExdzCCSEUMQqloONPTBMGqNqBUdr4UgSTs9bCzH1oLkuS6WgUgIu+xqWngQbjelUBNlDuzLWQ==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll",
+        "assembly":  "Microsoft.Bcl.AsyncInterfaces.dll",
+        "assemblySha512":  "06772AEDC8CF5495438C27DCDC25EC64AD4E9AB9FBA4AC1233B158D02B2F253D5BF6C8794C6CDD150B96C3C979C2A789DE2526664CF37FD576820BCD144482AF"
+    },
+    {
+        "packageId":  "Microsoft.Bcl.TimeProvider",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.bcl.timeprovider/10.0.12/microsoft.bcl.timeprovider.10.0.12.nupkg",
+        "packageSha512":  "YgZ5iXpo16E5nqvIqNiJXzyG8DiBsx3wg4jcwz8zxnxDV798izSzJn/PBg7s+xLU57+myilIxEg2RhQmNCcl0w==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/Microsoft.Bcl.TimeProvider.dll",
+        "assembly":  "Microsoft.Bcl.TimeProvider.dll",
+        "assemblySha512":  "8F9FFFE23D2B2125C6059241AFC8B688725CF625625E78A8F18B3F7236A7C48A53A0CA332D062D5440AF8559564A40E907FFB4B6B4551BF16D1A3C689E4C7663"
+    },
+    {
+        "packageId":  "Microsoft.Extensions.DependencyInjection.Abstractions",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection.abstractions/10.0.12/microsoft.extensions.dependencyinjection.abstractions.10.0.12.nupkg",
+        "packageSha512":  "9/qymSh7hVDMGTGwrLz8MRp5zRyXy9adGDOs4HwRdnLil3oZGYuWeZjbmHgCQ9BL1qBroVfgUK3U/nb61617Cw==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "assembly":  "Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "assemblySha512":  "6CB7429C8655F12841224898442AC28F76BB48D9900C079AE3ED30B2191B1A11EF192C59F74E18E440ACDCCD940733DF668DD269045C5C8CDC1601DAF4DE440E"
+    },
+    {
+        "packageId":  "Microsoft.Extensions.DependencyInjection",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.extensions.dependencyinjection/10.0.12/microsoft.extensions.dependencyinjection.10.0.12.nupkg",
+        "packageSha512":  "lXyK2O5GoYvfxW8eCFcD16JFbcoSTM1sJkAM0UHS1jZyl9NYMW64Tqm6OQFT0IDBjZi+xHt95/Zg+nxZhGFhZg==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.dll",
+        "assembly":  "Microsoft.Extensions.DependencyInjection.dll",
+        "assemblySha512":  "EE3AF789B4D72D29F9612BD453B798E41A29C00A8D4A9959BD1C2465CD9CB8E8B7EE023F74BF7267DB290D39C60CE9983D3052671D92A21D6B0F5B4194DD04AB"
+    },
+    {
+        "packageId":  "Microsoft.Extensions.Features",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.extensions.features/10.0.12/microsoft.extensions.features.10.0.12.nupkg",
+        "packageSha512":  "GaHsj8gISJ4BtRI4iK4meCil+LAYmv3NWuPKg6d29sw9cNsEN+1N8UMQXA/JhUXdrGTy16+B+YtjY3bco/8jMA==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/Microsoft.Extensions.Features.dll",
+        "assembly":  "Microsoft.Extensions.Features.dll",
+        "assemblySha512":  "0B3D1EE455DFF2B877E6E48C81F41DB89F19E0E362FEE9491885C40705DD53B2F08ACFB8EBA70B58DECA6FADD2E8B97A6BBE4CF9FF9DB2302E9B74A4607CAFE1"
+    },
+    {
+        "packageId":  "Microsoft.Extensions.Logging.Abstractions",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging.abstractions/10.0.12/microsoft.extensions.logging.abstractions.10.0.12.nupkg",
+        "packageSha512":  "+24lC4plfbEDNfLAdTV/SWKS7dW+16X4HdydO3R++134kSNTzcbYA4KpR1Hdh6uWisB8Za3AzwyOn+K+NxWIug==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/Microsoft.Extensions.Logging.Abstractions.dll",
+        "assembly":  "Microsoft.Extensions.Logging.Abstractions.dll",
+        "assemblySha512":  "B7F8D781A95C23C232DE57D32A627383AEFD4AE0B16F3C2090EE862E87C744BEA7844E1C2CCA5C8B69FB31F0BD53E233E87FBBD8D6F61DDB300A6E14D97D7AF5"
+    },
+    {
+        "packageId":  "Microsoft.Extensions.Logging",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.extensions.logging/10.0.12/microsoft.extensions.logging.10.0.12.nupkg",
+        "packageSha512":  "6I46fTPfgYkrjRYfRXbho9WOvOelTnNjWuZws/hzGHDASH1LEJeA4VKK9k3wJvido8o7jJSB5WkMTonX7HM1bA==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.1/Microsoft.Extensions.Logging.dll",
+        "assembly":  "Microsoft.Extensions.Logging.dll",
+        "assemblySha512":  "E3A3E577794196C934F19DE2CC4D6EF1F3B7E539934BA3781C776280B0DA10A70A0C8B28141DEEBF15E757B1370D03AA9407CA2D7E03726EF6F42DEF0CE9C7AF"
+    },
+    {
+        "packageId":  "Microsoft.Extensions.Options",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.extensions.options/10.0.12/microsoft.extensions.options.10.0.12.nupkg",
+        "packageSha512":  "TDYD33TSRpXKZWlmTXNlj5kCihxatmv2Ec1u6C+bMYLphCS7PoSLE9Pjd/nunDoE7yETk+LLKjVJX78HYtWjpA==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.1/Microsoft.Extensions.Options.dll",
+        "assembly":  "Microsoft.Extensions.Options.dll",
+        "assemblySha512":  "B684B791F76116E1E6C86C137805D1575BCFEB4382EE15821EDF232D30EFB4B696806CF9DBAAA15E9C1C6E1712F305B7FDE0043C618A61DD6E5E128E96D351B4"
+    },
+    {
+        "packageId":  "Microsoft.Extensions.Primitives",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/microsoft.extensions.primitives/10.0.12/microsoft.extensions.primitives.10.0.12.nupkg",
+        "packageSha512":  "dYfCLR52UA+3DL7C4I/pvSaRPkNqxrUAQmbFL2u0zvYKKzqgrFCJl08Df+F1aYc8leu9JvpC9bsURUdpExcBXQ==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/Microsoft.Extensions.Primitives.dll",
+        "assembly":  "Microsoft.Extensions.Primitives.dll",
+        "assemblySha512":  "4553F743242DD409EC30758B0ACDC79924D970F17B3BAE69AA2475202397FE71ECBC42D922CD76860F710977B23F89E4F4951CA869F2628F4BD16F84FBAE6BE2"
+    },
+    {
+        "packageId":  "System.Diagnostics.DiagnosticSource",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/system.diagnostics.diagnosticsource/10.0.12/system.diagnostics.diagnosticsource.10.0.12.nupkg",
+        "packageSha512":  "CRZTWYO0rzEcJN/6SuN1kMvQOJT7vyHZ64CCkQs0RRWTj7kH2KMkaMalbsbSI/eg5dS5JAQfQFFuuWgn+XRMsQ==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/System.Diagnostics.DiagnosticSource.dll",
+        "assembly":  "System.Diagnostics.DiagnosticSource.dll",
+        "assemblySha512":  "A3D07D6427ED1E3C749F8ED4388543A14C900BFF14FA3E0145EC76A02753EF90CDA838F16007E1F3CEF4876A01FFFE351E3BC8A5F8A9B45ACE85613A10691DF1"
+    },
+    {
+        "packageId":  "System.IO.Pipelines",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/system.io.pipelines/10.0.12/system.io.pipelines.10.0.12.nupkg",
+        "packageSha512":  "5e8M112rzbW5xKNXKipNFoTgM330QS6S6+UA6CaDyr/KDrow8bzfvOPFA4S05QC3n/m096oj+pfttvme6I0YyA==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/System.IO.Pipelines.dll",
+        "assembly":  "System.IO.Pipelines.dll",
+        "assemblySha512":  "DE0EBE0558E00EB3EDE1AB98680749CF07B49E298C3078C4FE5538A01413EA241FE0465BC27488B715B8682DC34A8583665AF319231429C75BB2536D07069EAE"
+    },
+    {
+        "packageId":  "System.Net.ServerSentEvents",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/system.net.serversentevents/10.0.12/system.net.serversentevents.10.0.12.nupkg",
+        "packageSha512":  "72010m/U1v06btqPUDgSatcYvHMPSKBbwYsTMBzaONx1ksCG2mz0CCnzaikCrQggjz5l7V7mzpD8yiCoKqNV2A==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/System.Net.ServerSentEvents.dll",
+        "assembly":  "System.Net.ServerSentEvents.dll",
+        "assemblySha512":  "269B47FD365042E79A725CB0DDB65CBD825C4DFBB31F128CC48EF901505B3423F54373380F0EEB32E0F54CEF1C5291890DDFE9097555823940BCCE83C4179CD6"
+    },
+    {
+        "packageId":  "System.Runtime.CompilerServices.Unsafe",
+        "version":  "6.1.2",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/system.runtime.compilerservices.unsafe/6.1.2/system.runtime.compilerservices.unsafe.6.1.2.nupkg",
+        "packageSha512":  "2hBr6zdbIBTDE3EhK7NSVNdX58uTK6iHW/P/Axmm9sl1xoGSLqDvMtpecn226TNwHByFokYwJmt/aQQNlO5CRw==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
+        "assembly":  "System.Runtime.CompilerServices.Unsafe.dll",
+        "assemblySha512":  "D2C074C9E191BCB3C6C13A3B69BC713D891276BF640383A297BBE80B3761E2A4AEEA3309A02DEA98141BCCE49F0F0FF116C25440EC7ADEEC992EEFDBDA8845BD"
+    },
+    {
+        "packageId":  "System.Text.Encodings.Web",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/system.text.encodings.web/10.0.12/system.text.encodings.web.10.0.12.nupkg",
+        "packageSha512":  "5wdXVVbJ5TH6YdKJYM0CHvQOY6SiCCeQ3KyLRx9daWag0cT9g4FT5CGN2qCNWbHZkqaCOEPRiA0uCBARB5Vk7w==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/System.Text.Encodings.Web.dll",
+        "assembly":  "System.Text.Encodings.Web.dll",
+        "assemblySha512":  "D6EC05E44C1873C04FE5E767CC0F21A264F5BDEF14B09BF02DA66060FB80323A9E6A9107D884296CC99FED2384FC6AE06CD1BD31304BCFAED231A1E7B09E40F7"
+    },
+    {
+        "packageId":  "System.Text.Json",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/system.text.json/10.0.12/system.text.json.10.0.12.nupkg",
+        "packageSha512":  "AHlVpUiY96eC6Oar1Gf0YbafU7E2NUU9D80O2Xk5v7ryL3kpSsbI0EusJBE8kQfwPuDdUDoKUItArzXQHxomCg==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.0/System.Text.Json.dll",
+        "assembly":  "System.Text.Json.dll",
+        "assemblySha512":  "A71216D55180FCCC21B6E926FBCB0EDBFF2C2D01D8311AE777CE2DB1DEE2D8442F490947AD5D96F94212ABF19FC98D229568832AF9547CAC646D8732E1230417"
+    },
+    {
+        "packageId":  "System.Threading.Channels",
+        "version":  "10.0.12",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/system.threading.channels/10.0.12/system.threading.channels.10.0.12.nupkg",
+        "packageSha512":  "/iUnzLpSBUUnnIHj/jSjhyEqhgm2eo/D2SF1Ga9ojuMqsua+QwKqByukl0UA9/Rth+P0sVJhXZojzgpV0A5Kdw==",
+        "license":  "expression:MIT",
+        "asset":  "lib/netstandard2.1/System.Threading.Channels.dll",
+        "assembly":  "System.Threading.Channels.dll",
+        "assemblySha512":  "E9015F82D453BEC36E0934853BB8989A1660F776394BFC2618325858C77D70A1ECD86BFF302FCF0AB8CF428EECE764ACFC219055004468C5B9D0FF85B811DF09"
+    },
+    {
+        "packageId":  "Voxta.Model",
+        "version":  "1.11.0-beta.1",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/voxta.model/1.11.0-beta.1/voxta.model.1.11.0-beta.1.nupkg",
+        "packageSha512":  "ypKTSBZ3mDySfMozmMFt7osYaRvH2BpQcgh1NWhB9RRonWHYG/+9Ci2Jg4jwXPAkyGXnc1eSaq4bwqfjTPsfEQ==",
+        "license":  "file:LICENSE.md",
+        "asset":  "lib/netstandard2.1/Voxta.Model.dll",
+        "assembly":  "Voxta.Model.dll",
+        "assemblySha512":  "F5E60481C1A8A5D44167C6802E2E21D6F92E8531752A3095738381179F24DC137E9FFE602279649ADFE9E836F2BEE76DF6A228A45935AF3A755C5C24440D96D9"
+    }
+]

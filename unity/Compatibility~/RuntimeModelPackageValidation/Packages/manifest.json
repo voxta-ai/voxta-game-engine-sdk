@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "com.unity.test-framework": "1.1.33",
+    "com.voxta.game-engine-sdk": "file:../../../"
+  },
+  "testables": [
+    "com.voxta.game-engine-sdk"
+  ]
+}

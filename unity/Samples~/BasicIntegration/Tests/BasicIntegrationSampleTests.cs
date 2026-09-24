@@ -3,7 +3,8 @@ using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Voxta.Unity.Protocol.Generated;
+using Voxta.Model.Shared;
+using Voxta.Model.WebsocketMessages.ServerMessages;
 
 namespace Voxta.Unity.Samples.BasicIntegration.Tests
 {

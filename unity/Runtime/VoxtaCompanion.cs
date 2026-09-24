@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
 using UnityEngine.Events;
-using Voxta.Unity.Protocol.Generated;
+using Voxta.Model.Shared;
+using Voxta.Model.WebsocketMessages.ServerMessages;
 
 namespace Voxta.Unity
 {
@@ -143,6 +144,7 @@ namespace Voxta.Unity
                 {
                     AudioInput = microphoneInputActive ? AudioInputClientCapabilities.WebSocketStream : AudioInputClientCapabilities.None,
                     AudioOutput = unityPlaybackActive ? AudioOutputClientCapabilities.Url : AudioOutputClientCapabilities.None,
+                    AcceptedAudioContentTypes = new[] { "audio/x-wav" },
                     VisionCapture = visionCapture
                 });
                 session = new VoxtaChatSession(client);

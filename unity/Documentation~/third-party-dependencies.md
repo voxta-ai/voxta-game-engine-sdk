@@ -1,26 +1,29 @@
 # M1 managed dependency closure
 
-The package vendors the Voxy-proven, Unity NuGet lock-resolved `netstandard2.0`
+The package vendors the locked `netstandard2.0` and `netstandard2.1` runtime
 assemblies in `Runtime/Plugins/ThirdParty`. This makes local-path and git UPM
 installs self-contained: consuming projects do not need the `org.nuget` scoped
 registry or any NuGet manifest entries.
 
-Voxy declares `Microsoft.AspNetCore.SignalR.Client` 8.0.2 and
-`System.Text.Json` 8.0.0. Its lock file resolves `System.Text.Json` to 8.0.2,
-which is required by the SignalR 8.0.2 graph. The package therefore ships that
-resolved 8.0.2 assembly rather than an incompatible lower direct declaration.
+`Documentation~/RuntimeModelDependencyProbe/packages.lock.json` pins
+`Microsoft.AspNetCore.SignalR.Client` 10.0.12, `System.Text.Json` 10.0.12,
+and `Voxta.Model` 1.11.0-beta.1. The package ships the 24 selected assets
+recorded in `Runtime/Plugins/ThirdParty/RUNTIME-MODEL-DEPENDENCY-INVENTORY.json`.
+The closure intentionally omits System.Buffers, System.ComponentModel.Annotations,
+System.Memory, System.Numerics.Vectors, and System.Threading.Tasks.Extensions,
+because the Unity .NET Standard 2.1 target supplies those references.
 
-The copied assembly inventory and upstream license for each package live beside
-the binaries. `THIRD-PARTY-INVENTORY.txt` records package name, resolved version,
-and source package-cache path used to create this closure.
+The copied assembly inventory, selected assets, NuGet SHA-512 package hashes,
+and assembly SHA-512 hashes live beside the binaries. Run
+`pwsh ./Tools/ValidateRuntimeModelDependencyClosure.ps1` from the repository
+root to validate the vendored closure. Add `-VerifyPackageAssets` when the
+locked NuGet artifacts are available in the package cache to verify those
+artifacts and their selected assets too.
 
-## Pinned protocol-model input
+## Pinned protocol model
 
-`Runtime/Plugins/Voxta.Model/Voxta.Model.dll` is the `netstandard2.1` assembly
-from [Voxta.Model 1.11.0-beta.1](https://www.nuget.org/packages/Voxta.Model/1.11.0-beta.1).
-It is an input to `Tools/ProtocolGenerator`, not a Unity runtime assembly. Its
-plugin metadata disables it on every Unity platform because it depends on
-`System.Text.Json` 10.0.12, while the runtime transport's tested dependency
-closure uses 8.0.2. `Tools/ProtocolGenerator/pinned-model.json` records its
-repository commit and SHA-512 hash; the generator verifies the hash before
-writing or checking generated protocol code.
+`Voxta.Model.dll` is the `netstandard2.1` assembly from
+[Voxta.Model 1.11.0-beta.1](https://www.nuget.org/packages/Voxta.Model/1.11.0-beta.1).
+It is enabled for the Editor and standalone Windows, Linux, and macOS targets
+with the rest of the runtime closure. `Tools/ProtocolGenerator/pinned-model.json`
+continues to record the generator input's repository commit and SHA-512 hash.

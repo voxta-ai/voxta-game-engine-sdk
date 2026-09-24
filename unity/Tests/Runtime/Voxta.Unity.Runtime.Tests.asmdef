@@ -6,7 +6,7 @@
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": true,
-  "precompiledReferences": ["System.Text.Json.dll"],
+  "precompiledReferences": ["System.Text.Json.dll", "Voxta.Model.dll"],
   "autoReferenced": false,
   "defineConstraints": [],
   "versionDefines": [],
