@@ -4,4 +4,3 @@ unity/Compatibility~/**/ProjectSettings/*.asset whitespace=-trailing-space
 unity/Compatibility~/**/*.meta whitespace=-trailing-space
 unity/Compatibility~/**/*.unity whitespace=-trailing-space
 unity/Tests/Runtime/ModelProtocolTests.cs.meta whitespace=-trailing-space
-unity/Documentation~/RUNTIME-MODEL-DEPENDENCY-UPGRADE-PLAN.md whitespace=-trailing-space

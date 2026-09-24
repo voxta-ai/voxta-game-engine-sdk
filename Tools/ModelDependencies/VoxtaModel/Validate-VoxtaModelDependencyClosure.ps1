@@ -10,7 +10,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $repositoryRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $thirdPartyRoot = Join-Path $repositoryRoot 'unity/Runtime/Plugins/ThirdParty'
 $inventoryPath = Join-Path $thirdPartyRoot 'RUNTIME-MODEL-DEPENDENCY-INVENTORY.json'
-$lockPath = Join-Path $repositoryRoot 'unity/Documentation~/RuntimeModelDependencyProbe/packages.lock.json'
+$lockPath = Join-Path $repositoryRoot 'Tools/ModelDependencies/VoxtaModel/Probe/packages.lock.json'
 
 if (-not (Test-Path -LiteralPath $inventoryPath)) {
     throw "Missing runtime dependency inventory: $inventoryPath"

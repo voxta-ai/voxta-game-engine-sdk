@@ -22,9 +22,7 @@ runtime path.
 | `Voxta.Unity.Protocol.Generated` | `Voxta.Model.WebsocketMessages.ServerMessages` | `ServerMessage`, `ServerChatSessionMessage`, `ServerWelcomeMessage`, `ServerAuthenticationRequiredMessage`, `ServerErrorMessage`, `ServerChatStartingMessage`, `ServerChatStartedMessage`, `ServerReplyStartMessage`, `ServerReplyChunkMessage`, `ServerReplyEndMessage`, `ServerSpeechPlaybackStartMessage`, `ServerSpeechPlaybackCompleteMessage`, `ServerInterruptSpeechMessage`, `ServerContextUpdatedMessage`, `ServerAnimationPlayMessage`, `ServerChatSessionErrorMessage`, `ServerActionMessage`, `ServerActionAppTriggerMessage`, `ServerRecordingRequestMessage`, `ServerSpeechRecognitionStartMessage`, `ServerSpeechRecognitionPartialMessage`, `ServerSpeechRecognitionEndMessage`, `ServerAudioFrameMessage`, `TranscriptWordInfo`, `TranscriptRepairInfo` |
 | `Voxta.Unity.Protocol.Generated` | `Voxta.Model.Shared` | `ClientCapabilities`, audio capability enums, `ActionInvocationArgument`, `ContextDefinition`, `ScenarioActionDefinition`, `FunctionArgumentDefinition`, `FunctionArgumentType`, `PromptCategories`, `PromptPositions`, `ChatMessageRole`, `ChatMessage`, `ChatParticipantInfo`, `FlagInfo` |
 
-The complete generated-to-model DTO mapping, including types that are not in a
-public SDK signature but can appear in model payloads, is maintained in
-[`runtime-model-type-migration-map.md`](runtime-model-type-migration-map.md).
+The table below lists the affected public SDK surface.
 
 ## Affected SDK surface
 

@@ -118,5 +118,5 @@ InitTestScene*.unity*
 /unity/Compatibility~/**/*.csproj
 /unity/Compatibility~/**/*.sln
 /unity/Compatibility~/**/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
-/unity/Documentation~/RuntimeModelDependencyProbe/bin/
-/unity/Documentation~/RuntimeModelDependencyProbe/obj/
+
+!Tools/ModelDependencies/VoxtaModel/Probe/VoxtaModelClosureProbe.csproj

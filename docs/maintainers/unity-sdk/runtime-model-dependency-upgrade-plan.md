@@ -27,8 +27,8 @@ The public runtime uses `Voxta.Model.dll` directly for protocol messages and JSO
 ## 1. Establish the target dependency closure
 
 - [x] Select an exact SignalR 10 patch version compatible with `System.Text.Json` 10.0.12. SignalR 10.0.12 was selected to match the model-required JSON 10.0.12 servicing release.
-- [x] Restore the target closure in a temporary .NET Standard 2.1 probe project using `Voxta.Model` 1.11.0-beta.1 and the selected SignalR version. The locked probe is in `Documentation~/RuntimeModelDependencyProbe/`.
-- [x] Record the exact package IDs, package versions, source URLs, SHA-512 hashes, licenses, and selected `lib/netstandard2.0` or `lib/netstandard2.1` assets. The machine-readable inventory is in `Compatibility~/RuntimeModelUnity2022Probe/Assets/Plugins/CandidateClosure/candidate-assembly-inventory.json`; the review document is `Documentation~/runtime-model-dependency-closure.md`.
+- [x] Restore the target closure in a temporary .NET Standard 2.1 probe project using `Voxta.Model` 1.11.0-beta.1 and the selected SignalR version. The locked probe is in `Tools/ModelDependencies/VoxtaModel/Probe/`.
+- [x] Record the exact package IDs, package versions, source URLs, SHA-512 hashes, licenses, and selected `lib/netstandard2.0` or `lib/netstandard2.1` assets. The machine-readable inventory is in `Compatibility~/RuntimeModelUnity2022Probe/Assets/Plugins/CandidateClosure/candidate-assembly-inventory.json`; the review document is `runtime-model-dependency-closure.md`.
 - [x] Include at minimum: SignalR client/core/common/JSON protocol, HTTP connections client/common, connections abstractions, Microsoft.Extensions dependency injection/logging/options/primitives/features, `Microsoft.Bcl.TimeProvider`, `System.Text.Json`, `System.Text.Encodings.Web`, `System.IO.Pipelines`, `System.Threading.Channels`, diagnostic source, and unsafe/runtime support dependencies selected by restore.
 - [x] Compare the target closure against the currently vendored third-party files and identify removals, additions, and version replacements. The candidate contains 24 DLLs, adds `System.Net.ServerSentEvents` and `Voxta.Model`, and omits platform-provided legacy support DLLs.
 - [x] Update `Third Party Notices.md` and `Documentation~/third-party-dependencies.md` with the final inventory and license notices.
@@ -63,11 +63,11 @@ The probe stores its build scene at `Compatibility~/RuntimeModelUnity2022Probe/A
 
 ## 4. Replace generated DTO use with model types
 
-- [x] Inventory every public and internal reference to `M1Messages.g.cs`, generated serializer options, converters, discriminators, and message-registration code. See `Documentation~/runtime-model-type-migration-map.md`.
-- [x] Map each generated message type to its `Voxta.Model` equivalent, including namespaces, property names, constructors, enums, and nullable/default behavior. See `Documentation~/runtime-model-type-migration-map.md`.
+- [x] Inventory every public and internal reference to `M1Messages.g.cs`, generated serializer options, converters, discriminators, and message-registration code. See `runtime-model-type-migration-map.md`.
+- [x] Map each generated message type to its `Voxta.Model` equivalent, including namespaces, property names, constructors, enums, and nullable/default behavior. See `runtime-model-type-migration-map.md`.
 - [x] Update `VoxtaClient`, `VoxtaChatSession`, `VoxtaActions`, `VoxtaAuth`, `VoxtaMicrophone`, `VoxtaSpeechPlayer`, and transport code to use model types directly.
 - [x] Replace generated polymorphic `$type` dispatch with the model-supported serialization configuration, preserving safe handling of unknown future messages.
-- [x] Preserve current public SDK API behavior where feasible; document and version any unavoidable public type changes. `0.1.0-pre.2` documents the generated-namespace-to-`Voxta.Model` type-identity migration in `Documentation~/runtime-model-public-api-migration.md` and the package changelog.
+- [x] Preserve current public SDK API behavior where feasible; document and version any unavoidable public type changes. `0.1.0-pre.2` documents the generated-namespace-to-`Voxta.Model` type-identity migration in `../../../unity/Documentation~/runtime-model-public-api-migration.md` and the package changelog.
 - [x] Update `link.xml` to preserve model message types and serialization metadata needed by IL2CPP.
 - [x] Remove `M1Messages.g.cs` and generated-runtime assembly references only after all replacement code compiles and tests pass. Removed `Runtime/Protocol/Generated/M1Messages.g.cs` and its Unity metadata; clean package validation rebuilt the runtime and test assemblies successfully, and the preceding validation suite had 65 passes with 4 explicit live-server skips.
 

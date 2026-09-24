@@ -80,7 +80,7 @@ The SDK owns its transport implementation under `Runtime/Transport/`. It bundles
 
 ## M2 — Protocol contract v0
 
-- [x] Create `Documentation~/protocol-v0.md`.
+- [x] Create `protocol-v0.md`.
 - [x] Document server URL normalization, `/hub` connection, bearer token transport, and authenticate/welcome exchange.
 - [x] Document capability negotiation and the M1 capability profile.
 - [x] Add sequence diagrams for start chat, text send, streamed reply, interruption, and reconnect.
@@ -159,7 +159,7 @@ HTTP decoder. The current local-server debugging established these contract fact
 | 2026-09-19 | M1 local text-chat integration | Unity 2022.3.62f3 Play mode, local Voxta server | The companion authenticated, started a chat from a character GUID, sent text, received streamed replies, and displayed the replies in the sample UI. |
 | 2026-09-19 | M1 fresh local-path integration | Fresh Unity 2022.3 project | The package installed by local path, the BasicIntegration sample installed, and the local-server text chat completed successfully. |
 | 2026-09-20 | M1 IL2CPP player integration | Unity 2022.3.62f3 Windows IL2CPP player, `G:\Unity\VoxtaSDK-test-build` | After importing the sample's Assets-level SignalR linker configuration, the built player connected, started the configured chat, and exchanged text exactly as in Play mode. |
-| 2026-09-20 | M2 protocol contract v0 | `Documentation~/protocol-v0.md`; transport, generated M1 DTOs, and pinned server/client references reviewed | Documents verified M1 behavior, M3 protocol targets, and remaining compatibility questions. No M1 server defect required an upstream issue or pull request. |
+| 2026-09-20 | M2 protocol contract v0 | `protocol-v0.md`; transport, generated M1 DTOs, and pinned server/client references reviewed | Documents verified M1 behavior, M3 protocol targets, and remaining compatibility questions. No M1 server defect required an upstream issue or pull request. |
 | 2026-09-20 | M3 speech playback implementation | `Runtime/VoxtaSpeechPlayer.cs`, generated M3 protocol subset, and BasicIntegration sample | Implemented the Unity playback state machine, capability selection, lifecycle events, WAV deferred-URL decoding, and sample audio components. Unity compilation passed before the final live-server decoder/routing fixes; live playback and interruption verification remains in progress. |
 | 2026-09-20 | M3 automated playback lifecycle tests | Unity Test Runner, `voxtaSDK-sandbox` | All 27 runtime tests passed after adding `replyStart`, interrupted-completion, and player/server interruption cases. |
 | 2026-09-20 | M3 automated microphone and protocol tests | Unity Play Mode Test Runner, `voxtaSDK-sandbox` | All 37 Play Mode tests passed with 0 failures, including PCM16 conversion, audio-input URL construction, generated recognition/VAD contracts, and final transcript chat-send coverage. There are no current Edit Mode tests. |

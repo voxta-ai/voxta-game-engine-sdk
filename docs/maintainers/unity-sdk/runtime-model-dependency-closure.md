@@ -22,7 +22,7 @@ truth in:
 - `Runtime/Plugins/ThirdParty/RUNTIME-MODEL-DEPENDENCY-INVENTORY.json`
 - `Runtime/Plugins/ThirdParty/THIRD-PARTY-INVENTORY.txt`
 - `Runtime/Plugins/ThirdParty/licenses/`
-- `Documentation~/RuntimeModelDependencyProbe/packages.lock.json`
+- `Tools/ModelDependencies/VoxtaModel/Probe/packages.lock.json`
 
 `Tools/ModelDependencies/VoxtaModel/pinned-model.json` records the intentionally
 selected `Voxta.Model` package, repository commit, and shipped assembly hash.
