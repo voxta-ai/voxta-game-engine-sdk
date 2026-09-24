@@ -110,13 +110,11 @@ jobs:
           allowDirtyBuild: true
 
       - name: Run package Edit and Play Mode tests
-        uses: game-ci/unity-test-runner@v4.4.0
+        uses: game-ci/unity-test-runner@v4.3.1
         with:
           customImage: ${{ env.UNITY_WINDOWS_MONO_IMAGE }}
           projectPath: ${{ env.VALIDATION_PROJECT }}
           testMode: all
-          # Game-CI enables this by default; this package does not support it.
-          coverageEnabled: false
           artifactsPath: artifacts/test-results
 
       - name: Build Basic Chat Integration for Windows Mono
