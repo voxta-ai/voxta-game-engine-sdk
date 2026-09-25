@@ -19,7 +19,8 @@ macOS. The full package versions, NuGet source URLs, selected assets, package
 content hashes, assembly hashes, and license information are the source of
 truth in:
 
-- `Runtime/Plugins/ThirdParty/RUNTIME-MODEL-DEPENDENCY-INVENTORY.json` for third-party assemblies`n- `Runtime/Plugins/Voxta/VOXTA-MODEL-INVENTORY.json` for `Voxta.Model.dll`
+- `Runtime/Plugins/ThirdParty/RUNTIME-MODEL-DEPENDENCY-INVENTORY.json` for third-party assemblies
+- `Runtime/Plugins/Voxta/VOXTA-MODEL-INVENTORY.json` for `Voxta.Model.dll`
 - `Runtime/Plugins/ThirdParty/THIRD-PARTY-INVENTORY.txt`
 - `Runtime/Plugins/ThirdParty/licenses/` and `Runtime/Plugins/Voxta/licenses/`
 - `Tools/ModelDependencies/VoxtaModel/Probe/packages.lock.json`

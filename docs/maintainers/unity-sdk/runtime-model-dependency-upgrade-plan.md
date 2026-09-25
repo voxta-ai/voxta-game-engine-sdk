@@ -83,7 +83,7 @@ The probe stores its build scene at `Compatibility~/RuntimeModelUnity2022Probe/A
 
 - [x] Run the clean Unity package-validation project with the target DLL closure. Unity 2022.3.62f3 PlayMode validation discovered 69 tests: 65 passed, 0 failed, and 4 explicit live-server tests were skipped.
 - [x] Run CI package tests, Windows Mono build, and Linux IL2CPP build. The hosted workflow passed all three validations on 2026-09-24; it runs for pull requests, manual dispatch, and pushed tags.
-- [ ] Verify build output contains exactly one intended `System.Text.Json` assembly and the expected SignalR/model assemblies. The workflow validates the Windows Mono player against the pinned hashes after the build; a hosted build is pending.
+- [x] Verify build output contains exactly one intended `System.Text.Json` assembly and the expected SignalR/model assemblies. The Unity package CI workflow validates the Windows Mono player against the pinned assembly hashes after its build.
 - [x] Run the BasicIntegration sample against a compatible Voxta server: device flow, saved token reuse, text reply, `wave` action, authenticated reply-audio download, spatial playback, and microphone input. Verified in the sandbox live run on 2026-09-23.
 - [x] Review binary/package size and platform support changes for release notes. The managed closure changes from 27 DLLs / 2,461,632 bytes to 24 DLLs / 2,768,792 bytes (+307,160 bytes); it supports the Editor and standalone Windows, Linux, and macOS targets.
 - [x] Update package documentation to state that `Voxta.Model` is now a runtime dependency and identify the pinned version. `README.md` and `Documentation~/third-party-dependencies.md` identify the vendored `Voxta.Model` 1.11.0-beta.1 and its locked closure.

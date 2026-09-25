@@ -101,6 +101,11 @@ jobs:
           buildMethod: Voxta.CI.UnityPackageValidationBuild.BuildMonoWindows64
           allowDirtyBuild: true
 
+      - name: Validate Windows Mono managed closure
+        shell: pwsh
+        run: |
+          ./Tools/UnityValidation/Validate-UnityPlayerManagedClosure.ps1 `
+            -PlayerPath "$env:VALIDATION_PROJECT/Builds/Windows64-Mono/VoxtaBasicIntegration.exe"
       - name: Reclaim Windows Mono image space before the IL2CPP build
         shell: bash
         run: |
