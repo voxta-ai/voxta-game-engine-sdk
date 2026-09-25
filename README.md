@@ -4,7 +4,7 @@ The official Unity package for connecting games to a [Voxta](https://voxta.ai)
 server. It provides runtime components for device authorization, chat,
 microphone input, Unity-owned reply audio, and server-triggered game actions.
 
-The package targets Unity 2022.3 LTS. The current package version is
+Requires Unity 2022.3 LTS or later. CI currently validates Unity 2022.3.62f3. The current package version is
 `0.1.0-beta.1`.
 
 ## Install

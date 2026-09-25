@@ -1,6 +1,6 @@
 # Voxta Game Engine SDK for Unity
 
-`com.voxta.game-engine-sdk` connects a Unity 2022.3 LTS project to a Voxta
+`com.voxta.game-engine-sdk` connects a Unity 2022.3 LTS or later project to a Voxta
 server. The **Basic Chat Integration** sample is the fastest way to get a
 talking companion: text chat, microphone input, Unity-owned spatial reply audio,
 and a game-action callback are ready in one scene.
