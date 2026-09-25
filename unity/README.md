@@ -17,7 +17,7 @@ In Unity 2022.3 LTS or later:
 
 1. Open **Window > Package Manager**.
 2. Select **+ > Add package from git URL** and enter
-   `https://github.com/voxta-ai/voxta-game-engine-sdk.git?path=/unity`.
+   `https://github.com/voxta-ai/voxta-game-engine-sdk.git?path=/unity#v0.1.0-beta.1`.
    For a local checkout, use **Add package from disk** and select its
    `unity/package.json` instead.
 3. Select **Voxta Game Engine SDK**, open **Samples**, and import **Basic Chat

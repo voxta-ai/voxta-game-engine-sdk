@@ -7,5 +7,4 @@ Integration** sample for a working integration.
 - [Third-party runtime dependencies](third-party-dependencies.md)
 - [Release notes](release-notes/)
 
-Maintainer plans, protocol implementation records, and vendored-dependency
-audit procedures are kept outside this package under `docs/maintainers/`.
+Internal maintenance records and dependency-audit procedures are not shipped with this package.

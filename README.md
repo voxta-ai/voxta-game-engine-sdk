@@ -13,7 +13,7 @@ In Unity, open **Window > Package Manager**, choose **+ > Add package from git
 URL**, and enter:
 
 ```
-https://github.com/voxta-ai/voxta-game-engine-sdk.git?path=/unity
+https://github.com/voxta-ai/voxta-game-engine-sdk.git?path=/unity#v0.1.0-beta.1
 ```
 
 For a local checkout, use **Add package from disk** and select
@@ -31,12 +31,11 @@ and the [runtime dependency notes](unity/Documentation~/third-party-dependencies
 
 ## Contributing
 
-Maintainer plans, dependency-closure records, and protocol implementation notes
-are in [docs/maintainers/unity-sdk](docs/maintainers/unity-sdk/). The Unity
-package itself is under [unity](unity/).
+See [CONTRIBUTING.md](CONTRIBUTING.md). The Unity package itself is under
+[unity](unity/).
 
 ## License
 
-See the package [license](unity/LICENSE.md). `Voxta.Model` is shipped as a
-runtime dependency under its own license notice in
+This repository is licensed under the [MIT License](LICENSE). `Voxta.Model` is
+shipped as a runtime dependency under its own license notice in
 `unity/Runtime/Plugins/Voxta/licenses/`.
