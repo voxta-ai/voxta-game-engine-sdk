@@ -5,7 +5,7 @@ server. It provides runtime components for device authorization, chat,
 microphone input, Unity-owned reply audio, and server-triggered game actions.
 
 The package targets Unity 2022.3 LTS. The current package version is
-`0.1.0-pre.2`.
+`0.1.0-beta.1`.
 
 ## Install
 

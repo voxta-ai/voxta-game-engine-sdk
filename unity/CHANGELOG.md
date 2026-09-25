@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0-pre.2
+## 0.1.0-beta.1
 
 - Replaced the generated `Voxta.Unity.Protocol.Generated` protocol DTOs used by
   the public SDK API with `Voxta.Model` 1.11.0-beta.1 types. This is a source

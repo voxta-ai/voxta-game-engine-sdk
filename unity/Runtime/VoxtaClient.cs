@@ -30,7 +30,7 @@ namespace Voxta.Unity
             transport = new VoxtaSignalRTransport(serverUrl, accessToken, new ClientAuthenticateMessage
             {
                 Client = "Voxta Unity SDK",
-                ClientVersion = "0.1.0-pre.2",
+                ClientVersion = "0.1.0-beta.1",
                 Capabilities = capabilities ?? new ClientCapabilities
                 {
                     AcceptedAudioContentTypes = new[] { "audio/x-wav" }

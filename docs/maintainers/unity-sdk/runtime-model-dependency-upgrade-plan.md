@@ -67,7 +67,7 @@ The probe stores its build scene at `Compatibility~/RuntimeModelUnity2022Probe/A
 - [x] Map each generated message type to its `Voxta.Model` equivalent, including namespaces, property names, constructors, enums, and nullable/default behavior. See `runtime-model-type-migration-map.md`.
 - [x] Update `VoxtaClient`, `VoxtaChatSession`, `VoxtaActions`, `VoxtaAuth`, `VoxtaMicrophone`, `VoxtaSpeechPlayer`, and transport code to use model types directly.
 - [x] Replace generated polymorphic `$type` dispatch with the model-supported serialization configuration, preserving safe handling of unknown future messages.
-- [x] Preserve current public SDK API behavior where feasible; document and version any unavoidable public type changes. `0.1.0-pre.2` documents the generated-namespace-to-`Voxta.Model` type-identity migration in `../../../unity/Documentation~/runtime-model-public-api-migration.md` and the package changelog.
+- [x] Preserve current public SDK API behavior where feasible; document and version any unavoidable public type changes. `0.1.0-beta.1` documents the generated-namespace-to-`Voxta.Model` type-identity migration in `../../../unity/Documentation~/runtime-model-public-api-migration.md` and the package changelog.
 - [x] Update `link.xml` to preserve model message types and serialization metadata needed by IL2CPP.
 - [x] Remove `M1Messages.g.cs` and generated-runtime assembly references only after all replacement code compiles and tests pass. Removed `Runtime/Protocol/Generated/M1Messages.g.cs` and its Unity metadata; clean package validation rebuilt the runtime and test assemblies successfully, and the preceding validation suite had 65 passes with 4 explicit live-server skips.
 
@@ -87,7 +87,7 @@ The probe stores its build scene at `Compatibility~/RuntimeModelUnity2022Probe/A
 - [x] Run the BasicIntegration sample against a compatible Voxta server: device flow, saved token reuse, text reply, `wave` action, authenticated reply-audio download, spatial playback, and microphone input. Verified in the sandbox live run on 2026-09-23.
 - [x] Review binary/package size and platform support changes for release notes. The managed closure changes from 27 DLLs / 2,461,632 bytes to 24 DLLs / 2,768,792 bytes (+307,160 bytes); it supports the Editor and standalone Windows, Linux, and macOS targets.
 - [x] Update package documentation to state that `Voxta.Model` is now a runtime dependency and identify the pinned version. `README.md` and `Documentation~/third-party-dependencies.md` identify the vendored `Voxta.Model` 1.11.0-beta.1 and its locked closure.
-- [x] Create a dedicated release note describing the dependency upgrade and any public API migration guidance. See `Documentation~/release-notes/0.1.0-pre.2-runtime-model-upgrade.md`.
+- [x] Create a dedicated release note describing the dependency upgrade and any public API migration guidance. See `Documentation~/release-notes/0.1.0-beta.1-runtime-model-upgrade.md`.
 
 ## Rollback point
 

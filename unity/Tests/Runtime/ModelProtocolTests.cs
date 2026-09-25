@@ -18,7 +18,7 @@ namespace Voxta.Unity.Tests
             var json = JsonSerializer.Serialize<ClientMessage>(new ClientAuthenticateMessage
             {
                 Client = "Voxta Unity SDK",
-                ClientVersion = "0.1.0-pre.2"
+                ClientVersion = "0.1.0-beta.1"
             }, VoxtaJsonSerializer.CreateSerializeOptions());
 
             StringAssert.Contains("\"$type\":\"authenticate\"", json);
@@ -34,7 +34,7 @@ namespace Voxta.Unity.Tests
             AssertWireFrame(new ClientAuthenticateMessage
             {
                 Client = "Voxta Unity SDK",
-                ClientVersion = "0.1.0-pre.2"
+                ClientVersion = "0.1.0-beta.1"
             }, "authenticate", payload =>
             {
                 Assert.That(payload.GetProperty("client").GetString(), Is.EqualTo("Voxta Unity SDK"));
@@ -133,7 +133,7 @@ namespace Voxta.Unity.Tests
             var json = JsonSerializer.Serialize(new ClientAuthenticateMessage
             {
                 Client = "Voxta Unity SDK",
-                ClientVersion = "0.1.0-pre.2"
+                ClientVersion = "0.1.0-beta.1"
             }, VoxtaJsonSerializer.CreateSerializeOptions());
 
             StringAssert.DoesNotContain("\"$type\"", json);

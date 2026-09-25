@@ -23,7 +23,7 @@ In Unity 2022.3 LTS or later:
 3. Select **Voxta Game Engine SDK**, open **Samples**, and import **Basic Chat
    Integration**.
 4. Open
-   `Assets/Samples/Voxta Game Engine SDK/0.1.0-pre.2/Basic Chat Integration/BasicIntegration.unity`.
+   `Assets/Samples/Voxta Game Engine SDK/0.1.0-beta.1/Basic Chat Integration/BasicIntegration.unity`.
 
 Importing the sample places its `link.xml` under `Assets`, which is needed for
 IL2CPP builds. If you build a different scene with `VoxtaCompanion`, copy the
@@ -107,7 +107,7 @@ components and local-server behavior. Imported samples under `Assets/Samples`
 are copies: re-import the sample after package updates rather than expecting the
 copy to update with `Samples~`.
 
-## Protocol model API migration in 0.1.0-pre.2
+## Protocol model API migration in 0.1.0-beta.1
 
 This prerelease replaces the generated protocol DTO namespace
 `Voxta.Unity.Protocol.Generated` with types supplied by the bundled

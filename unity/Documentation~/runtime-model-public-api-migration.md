@@ -2,7 +2,7 @@
 
 ## Release scope
 
-`0.1.0-pre.2` replaces the SDK's generated protocol assembly types in
+`0.1.0-beta.1` replaces the SDK's generated protocol assembly types in
 `Voxta.Unity.Protocol.Generated` with the corresponding types from the pinned
 `Voxta.Model` `1.11.0-beta.1` runtime assembly. This is a source and binary
 compatibility break for application code that mentions a protocol type, even
