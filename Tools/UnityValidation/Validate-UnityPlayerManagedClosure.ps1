@@ -21,7 +21,10 @@ foreach ($inventoryPath in $inventoryPaths) {
     if (-not (Test-Path -LiteralPath $inventoryPath -PathType Leaf)) { throw "Runtime dependency inventory was not found: $inventoryPath" }
 }
 $inventory = @($inventoryPaths | ForEach-Object { Get-Content -Raw -LiteralPath $_ | ConvertFrom-Json | ForEach-Object { $_ } })
-$requiredAssemblies = @('System.Text.Json.dll', 'Voxta.Model.dll', $inventory.assembly | Where-Object { $_ -like 'Microsoft.AspNetCore.SignalR.*.dll' })
+$requiredAssemblies = @(
+    'System.Text.Json.dll'
+    'Voxta.Model.dll'
+) + @($inventory.assembly | Where-Object { $_ -like 'Microsoft.AspNetCore.SignalR.*.dll' }) | Select-Object -Unique
 $playerAssemblies = @(Get-ChildItem -LiteralPath $dataDirectory -Recurse -File -Filter '*.dll')
 foreach ($assemblyName in $requiredAssemblies) {
     $matches = @($playerAssemblies | Where-Object Name -eq $assemblyName)
