@@ -48,6 +48,9 @@ jobs:
           Write-Output "::warning title=Voxta.Model update available::Pinned $($pinned.packageVersion); NuGet latest is $latestVersion. Review and intentionally vendor the new model DLL."
   unity-package:
     name: Unity tests, package validation, and desktop builds
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-22.04
     env:
       UNITY_VERSION: 2022.3.62f3
