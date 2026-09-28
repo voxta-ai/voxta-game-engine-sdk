@@ -45,9 +45,9 @@ New-Item -ItemType Directory -Force $editorPath, $packagesPath, $projectSettings
 $manifest = @{
     dependencies = @{
         'com.unity.test-framework' = '1.1.33'
-        'com.voxta.game-engine-sdk' = $packageDependency
+        'ai.voxta.game-engine-sdk' = $packageDependency
     }
-    testables = @('com.voxta.game-engine-sdk')
+    testables = @('ai.voxta.game-engine-sdk')
 }
 
 $manifest | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $packagesPath 'manifest.json') -Encoding utf8

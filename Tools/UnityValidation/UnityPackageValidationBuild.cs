@@ -9,7 +9,7 @@ namespace Voxta.CI
 {
     public static class UnityPackageValidationBuild
     {
-        private const string PackageName = "com.voxta.game-engine-sdk";
+        private const string PackageName = "ai.voxta.game-engine-sdk";
         private const string ImportedSamplePath = "Assets/Samples/Voxta Game Engine SDK/Basic Chat Integration";
         private const string SampleScenePath = ImportedSamplePath + "/BasicIntegration.unity";
 
