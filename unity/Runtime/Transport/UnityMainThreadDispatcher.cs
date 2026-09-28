@@ -10,6 +10,15 @@ namespace Voxta.Unity.Transport
         private static readonly ConcurrentQueue<Action> Pending = new ConcurrentQueue<Action>();
         private static UnityMainThreadDispatcher instance;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            while (Pending.TryDequeue(out _))
+            {
+            }
+
+            instance = null;
+        }
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
         {

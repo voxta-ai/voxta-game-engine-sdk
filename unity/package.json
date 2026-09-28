@@ -4,13 +4,7 @@
   "displayName": "Voxta Game Engine SDK",
   "description": "The official Unity integration for the Voxta server. Includes runtime components for voice processing, networking, and context management.",
   "unity": "2022.3",
-  "dependencies": {
-    "com.unity.ugui": "1.0.0",
-    "com.unity.modules.audio": "1.0.0",
-    "com.unity.modules.jsonserialize": "1.0.0",
-    "com.unity.modules.unitywebrequestaudio": "1.0.0",
-    "com.unity.modules.unitywebrequest": "1.0.0"
-  },
+  "unityRelease": "62f3",
   "keywords": [
     "voxta",
     "ai",
