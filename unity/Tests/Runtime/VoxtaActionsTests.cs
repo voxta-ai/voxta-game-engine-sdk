@@ -502,10 +502,10 @@ namespace Voxta.Unity.Tests
         private sealed class FakeTransport : IVoxtaTransport
         {
             public event Action<ServerMessage> MessageReceived;
-            public event Action<Exception> Error;
-            public event Action Disconnected;
-            public event Action Reconnecting;
-            public event Action Reconnected;
+            event Action<Exception> IVoxtaTransport.Error { add { } remove { } }
+            event Action IVoxtaTransport.Disconnected { add { } remove { } }
+            event Action IVoxtaTransport.Reconnecting { add { } remove { } }
+            event Action IVoxtaTransport.Reconnected { add { } remove { } }
             public readonly List<ClientMessage> Sent = new List<ClientMessage>();
             public Task ConnectAsync(CancellationToken cancellationToken) => Task.CompletedTask;
             public Task DisconnectAsync() => Task.CompletedTask;
