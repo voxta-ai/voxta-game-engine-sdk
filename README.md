@@ -33,9 +33,3 @@ and the [runtime dependency notes](unity/Documentation~/third-party-dependencies
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). The Unity package itself is under
 [unity](unity/).
-
-## License
-
-This repository is licensed under the [MIT License](LICENSE). `Voxta.Model` is
-shipped as a runtime dependency under its own license notice in
-`unity/Runtime/Plugins/Voxta/licenses/`.
