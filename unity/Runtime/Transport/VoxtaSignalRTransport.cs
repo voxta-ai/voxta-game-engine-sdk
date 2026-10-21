@@ -10,7 +10,7 @@ using Voxta.Model.Serialization;
 using Voxta.Model.WebsocketMessages.ClientMessages;
 using Voxta.Model.WebsocketMessages.ServerMessages;
 
-namespace Voxta.Unity.Transport
+namespace Voxta.GameEngine.Transport
 {
     internal interface IVoxtaTransport : IAsyncDisposable
     {
@@ -86,7 +86,7 @@ namespace Voxta.Unity.Transport
                 }
 
                 if (!linked.IsCancellationRequested)
-                    await connection.SendAsync("SendMessage", authenticateMessage, linked.Token).ConfigureAwait(false);
+                    await SendMessageAsync(authenticateMessage, linked.Token).ConfigureAwait(false);
             }
         }
 
@@ -130,7 +130,7 @@ namespace Voxta.Unity.Transport
                     {
                         if (connection.State != HubConnectionState.Connected)
                             throw new VoxtaTransportDisconnectedException();
-                        await connection.SendAsync("SendMessage", message, cancellation.Token).ConfigureAwait(false);
+                        await SendMessageAsync(message, cancellation.Token).ConfigureAwait(false);
                     }
                     finally
                     {
@@ -150,6 +150,14 @@ namespace Voxta.Unity.Transport
             }
         }
 
+        // SignalR 8 serializes hub arguments as their runtime type, which drops the "$type"
+        // discriminator the server dispatches on. Serializing through the base type keeps it.
+        private Task SendMessageAsync(ClientMessage message, CancellationToken cancellationToken) =>
+            connection.SendAsync("SendMessage", ToHubArgument(message), cancellationToken);
+
+        internal static JsonElement ToHubArgument(ClientMessage message) =>
+            JsonSerializer.SerializeToElement(message, VoxtaJsonSerializer.SerializeOptions);
+
         private Task OnClosed(Exception exception)
         {
             if (exception != null && !cancellation.IsCancellationRequested)
@@ -167,7 +175,7 @@ namespace Voxta.Unity.Transport
         {
             try
             {
-                await connection.SendAsync("SendMessage", authenticateMessage, cancellation.Token).ConfigureAwait(false);
+                await SendMessageAsync(authenticateMessage, cancellation.Token).ConfigureAwait(false);
                 UnityMainThreadDispatcher.Post(() => Reconnected?.Invoke());
             }
             catch (Exception exception)

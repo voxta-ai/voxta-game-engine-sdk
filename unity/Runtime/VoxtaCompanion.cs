@@ -4,7 +4,7 @@ using UnityEngine.Events;
 using Voxta.Model.Shared;
 using Voxta.Model.WebsocketMessages.ServerMessages;
 
-namespace Voxta.Unity
+namespace Voxta.GameEngine
 {
     [Serializable] public sealed class VoxtaConnectionStateUnityEvent : UnityEvent<VoxtaConnectionState> { }
     [Serializable] public sealed class VoxtaWelcomeUnityEvent : UnityEvent<ServerWelcomeMessage> { }
@@ -80,13 +80,15 @@ namespace Voxta.Unity
 
         public VoxtaConnectionState ConnectionState => client == null ? VoxtaConnectionState.Disconnected : client.State;
         public VoxtaChatSession ChatSession => session;
-        public VoxtaSpeechPlayer SpeechPlayer => speechPlayer;
-        public VoxtaMicrophone Microphone => microphone;
-        public VoxtaActions Actions => actions;
+        // Resolved on access so scripts reading these in their own Awake don't depend on Awake order.
+        public VoxtaSpeechPlayer SpeechPlayer => speechPlayer != null ? speechPlayer : speechPlayer = GetComponent<VoxtaSpeechPlayer>();
+        public VoxtaMicrophone Microphone => microphone != null ? microphone : microphone = GetComponent<VoxtaMicrophone>();
+        public VoxtaActions Actions => actions != null ? actions : actions = GetComponent<VoxtaActions>();
         public VoxtaContextUpdatedUnityEvent OnContextUpdated => onContextUpdated;
         public VoxtaAnimationPlayUnityEvent OnAnimationPlay => onAnimationPlay;
         public VoxtaActionErrorUnityEvent OnActionError => onActionError;
         public string ServerUrl => serverUrl;
+        public string CharacterId => characterId;
 
         private void Awake()
         {
@@ -200,6 +202,14 @@ namespace Voxta.Unity
             if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("An API key is required.", nameof(value));
             if (client != null) throw new InvalidOperationException("Disconnect before changing the API key.");
             apiKey = value;
+        }
+
+        /// <summary>Sets the character the next connection starts a chat with.</summary>
+        public void SetCharacterId(string value)
+        {
+            if (!Guid.TryParse(value, out _)) throw new ArgumentException("Character ID must be a GUID.", nameof(value));
+            if (client != null) throw new InvalidOperationException("Disconnect before changing the character.");
+            characterId = value;
         }
 
         public void InterruptSpeech() { try { speechPlayer?.Interrupt(); } catch (Exception exception) { HandleError(exception); } }

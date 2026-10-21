@@ -3,8 +3,46 @@
 This package contains third-party software components. The licenses and notices below apply exclusively to these specific third-party components and do not apply to the rest of the assets in this package, which are governed by the standard Unity Asset Store End User License Agreement.
 
 ------------------------------------------------------------------------
-Component: Microsoft SignalR
+First-party component: Voxta.Model
+------------------------------------------------------------------------
+
+Runtime/Plugins/Voxta/Voxta.Model.dll is developed and owned by Voxta LLC,
+the publisher of this package, and is not a third-party component. As
+included in this package, it is licensed under the Unity Asset Store End
+User License Agreement, like the rest of this package's own content.
+Licenses published with the Voxta.Model NuGet package do not apply to this
+copy.
+
+------------------------------------------------------------------------
+Components: Microsoft ASP.NET Core SignalR client and .NET libraries
 License: MIT License
+Location: Runtime/Plugins/ThirdParty
+
+This notice applies to each of the following NuGet packages, whose
+netstandard assemblies are included in this package:
+
+  - Microsoft.AspNetCore.Connections.Abstractions
+  - Microsoft.AspNetCore.Http.Connections.Client
+  - Microsoft.AspNetCore.Http.Connections.Common
+  - Microsoft.AspNetCore.SignalR.Client
+  - Microsoft.AspNetCore.SignalR.Client.Core
+  - Microsoft.AspNetCore.SignalR.Common
+  - Microsoft.AspNetCore.SignalR.Protocols.Json
+  - Microsoft.Bcl.AsyncInterfaces
+  - Microsoft.Bcl.TimeProvider
+  - Microsoft.Extensions.DependencyInjection
+  - Microsoft.Extensions.DependencyInjection.Abstractions
+  - Microsoft.Extensions.Features
+  - Microsoft.Extensions.Logging
+  - Microsoft.Extensions.Logging.Abstractions
+  - Microsoft.Extensions.Options
+  - Microsoft.Extensions.Primitives
+  - System.Diagnostics.DiagnosticSource
+  - System.IO.Pipelines
+  - System.Runtime.CompilerServices.Unsafe
+  - System.Text.Encodings.Web
+  - System.Text.Json
+  - System.Threading.Channels
 ------------------------------------------------------------------------
 
 Copyright (c) .NET Foundation and Contributors

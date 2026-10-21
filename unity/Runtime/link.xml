@@ -8,5 +8,5 @@
   <assembly fullname="System.Text.Json" preserve="all" />
   <!-- Voxta.Model uses attribute-based polymorphic JSON metadata. -->
   <assembly fullname="Voxta.Model" preserve="all" />
-  <assembly fullname="Voxta.Unity.Runtime" preserve="all" />
+  <assembly fullname="Voxta.GameEngine.Runtime" preserve="all" />
 </linker>

@@ -11,9 +11,9 @@ using UnityEngine.TestTools;
 using Voxta.Model.Shared;
 using Voxta.Model.WebsocketMessages.ClientMessages;
 using Voxta.Model.WebsocketMessages.ServerMessages;
-using Voxta.Unity.Transport;
+using Voxta.GameEngine.Transport;
 
-namespace Voxta.Unity.Tests
+namespace Voxta.GameEngine.Tests
 {
     public sealed class VoxtaActionsTests
     {
@@ -263,7 +263,7 @@ namespace Voxta.Unity.Tests
             handler.Invoke(companion, new[] { message });
         }
 
-        [UnityTest, Explicit("Requires a running local server and the device-flow token saved by the M4 authorization verification.")]
+        [UnityTest, Explicit("Requires a running local server and a device-flow token saved by the Basic Integration sample.")]
         public System.Collections.IEnumerator PublishesActionRegistrationToTheLocalServer()
         {
             var token = new PlayerPrefsTokenStore().LoadToken();
@@ -305,7 +305,7 @@ namespace Voxta.Unity.Tests
             }
         }
 
-        [UnityTest, Explicit("Requires a running local server, the device-flow token saved by the M4 authorization verification, and a character that permits inferred actions.")]
+        [UnityTest, Explicit("Requires a running local server, a device-flow token saved by the Basic Integration sample, and a character that permits inferred actions.")]
         public System.Collections.IEnumerator DispatchesAnActionFromTheLocalServer()
         {
             var token = new PlayerPrefsTokenStore().LoadToken();
@@ -364,7 +364,7 @@ namespace Voxta.Unity.Tests
             }
         }
 
-        [UnityTest, Explicit("Requires a running local server, the device-flow token saved by the M4 authorization verification, and the local Assistant scenario.")]
+        [UnityTest, Explicit("Requires a running local server, a device-flow token saved by the Basic Integration sample, and the local Assistant scenario.")]
         public System.Collections.IEnumerator TriggersARegisteredActionWithScenarioContextOnTheLocalServer()
         {
             var token = new PlayerPrefsTokenStore().LoadToken();
@@ -436,7 +436,7 @@ namespace Voxta.Unity.Tests
             }
         }
 
-        [UnityTest, Explicit("Requires a running local server, the device-flow token saved by the M4 authorization verification, and the local queued app-trigger scenario.")]
+        [UnityTest, Explicit("Requires a running local server, a device-flow token saved by the Basic Integration sample, and the local queued app-trigger scenario.")]
         public System.Collections.IEnumerator DispatchesAndAcknowledgesAQueuedAppTriggerOnTheLocalServer()
         {
             var token = new PlayerPrefsTokenStore().LoadToken();

@@ -1,0 +1,12 @@
+[
+    {
+        "packageId":  "Voxta.Model",
+        "version":  "1.13.0-alpha.5",
+        "sourceUrl":  "https://api.nuget.org/v3-flatcontainer/voxta.model/1.13.0-alpha.5/voxta.model.1.13.0-alpha.5.nupkg",
+        "packageSha512":  "YjeAwg0pN6eHs7dWCxMm7dbXOdN4gJsJh8qfNH7PzRqS3JSZURv/TcHGY+WT6IixtQvvFTIRDIiubz/z4vPYqw==",
+        "license":  "first-party:Unity Asset Store EULA",
+        "asset":  "lib/netstandard2.1/Voxta.Model.dll",
+        "assembly":  "Voxta.Model.dll",
+        "assemblySha512":  "3E557D2CF27EEFB65A85D5631DA685C79502354773BC4ECB3DBF3FE53F319B1A8196FD13D387F66712FC927B1BE8C2B6242C488B99DC1AFEE7B92C29CFF418E2"
+    }
+]

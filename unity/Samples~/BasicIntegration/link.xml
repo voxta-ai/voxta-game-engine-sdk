@@ -10,5 +10,5 @@
   <assembly fullname="Microsoft.AspNetCore.Http.Connections.Client" preserve="all" />
   <assembly fullname="Microsoft.AspNetCore.Http.Connections.Common" preserve="all" />
   <assembly fullname="System.Text.Json" preserve="all" />
-  <assembly fullname="Voxta.Unity.Runtime" preserve="all" />
+  <assembly fullname="Voxta.GameEngine.Runtime" preserve="all" />
 </linker>

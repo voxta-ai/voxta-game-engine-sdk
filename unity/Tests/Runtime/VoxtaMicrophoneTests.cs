@@ -1,6 +1,6 @@
 using NUnit.Framework;
 
-namespace Voxta.Unity.Tests
+namespace Voxta.GameEngine.Tests
 {
     public sealed class VoxtaMicrophoneTests
     {

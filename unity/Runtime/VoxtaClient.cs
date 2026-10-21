@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 using Voxta.Model.Shared;
 using Voxta.Model.WebsocketMessages.ClientMessages;
 using Voxta.Model.WebsocketMessages.ServerMessages;
-using Voxta.Unity.Transport;
+using Voxta.GameEngine.Transport;
 
-namespace Voxta.Unity
+namespace Voxta.GameEngine
 {
     public enum VoxtaConnectionState { Disconnected, Connecting, Authenticating, Connected, Reconnecting, Faulted }
 
     /// <summary>Owns one authenticated SignalR connection and routes all public events through Unity's player loop.</summary>
     public sealed class VoxtaClient : IAsyncDisposable
     {
-        /// <summary>The server protocol revision represented by the pinned M1 model.</summary>
+        /// <summary>The server protocol revision represented by the bundled Voxta.Model.</summary>
         public const string SupportedApiVersion = "2025-11";
         private readonly IVoxtaTransport transport;
         private VoxtaConnectionState state;
@@ -29,8 +29,8 @@ namespace Voxta.Unity
         {
             transport = new VoxtaSignalRTransport(serverUrl, accessToken, new ClientAuthenticateMessage
             {
-                Client = "Voxta Unity SDK",
-                ClientVersion = "0.1.0-beta.1",
+                Client = "Voxta Game Engine SDK",
+                ClientVersion = "0.1.0-beta.2",
                 Capabilities = capabilities ?? new ClientCapabilities
                 {
                     AcceptedAudioContentTypes = new[] { "audio/x-wav" }

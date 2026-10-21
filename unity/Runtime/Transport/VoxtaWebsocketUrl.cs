@@ -1,6 +1,6 @@
 using System;
 
-namespace Voxta.Unity.Transport
+namespace Voxta.GameEngine.Transport
 {
     /// <summary>Canonical Voxta server URL normalization for the SignalR hub.</summary>
     public static class VoxtaWebsocketUrl

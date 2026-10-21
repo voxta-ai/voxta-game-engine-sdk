@@ -10,9 +10,21 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $repositoryRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $thirdPartyRoot = Join-Path $repositoryRoot 'unity/Runtime/Plugins/ThirdParty'
 $voxtaRoot = Join-Path $repositoryRoot 'unity/Runtime/Plugins/Voxta'
-$thirdPartyInventoryPath = Join-Path $thirdPartyRoot 'RUNTIME-MODEL-DEPENDENCY-INVENTORY.json'
-$voxtaInventoryPath = Join-Path $voxtaRoot 'VOXTA-MODEL-INVENTORY.json'
+$inventoryRoot = Join-Path $PSScriptRoot 'Inventory'
+$thirdPartyInventoryPath = Join-Path $inventoryRoot 'RUNTIME-MODEL-DEPENDENCY-INVENTORY.json'
+$voxtaInventoryPath = Join-Path $inventoryRoot 'VOXTA-MODEL-INVENTORY.json'
 $lockPath = Join-Path $repositoryRoot 'Tools/ModelDependencies/VoxtaModel/Probe/packages.lock.json'
+$noticesPath = Join-Path $thirdPartyRoot 'Third-Party Notices.txt'
+# Unity 6.5+ supplies these at 8.0 through its BCLExtensions profile and overrides same-named plug-ins.
+$unity65SuppliedAssemblies = @(
+    'Microsoft.Bcl.AsyncInterfaces.dll'
+    'Microsoft.Extensions.DependencyInjection.Abstractions.dll'
+    'Microsoft.Extensions.Logging.Abstractions.dll'
+    'System.Diagnostics.DiagnosticSource.dll'
+    'System.Runtime.CompilerServices.Unsafe.dll'
+    'System.Text.Encodings.Web.dll'
+    'System.Text.Json.dll'
+)
 
 foreach ($inventoryPath in @($thirdPartyInventoryPath, $voxtaInventoryPath)) {
     if (-not (Test-Path -LiteralPath $inventoryPath)) {
@@ -29,8 +41,8 @@ $voxtaInventory = @(Get-Content -Raw -LiteralPath $voxtaInventoryPath | ConvertF
     $_
 })
 $inventory = @($thirdPartyInventory + $voxtaInventory)
-if ($inventory.Count -ne 24) {
-    throw "Expected 24 runtime assemblies, found $($inventory.Count) inventory entries."
+if ($inventory.Count -ne 23) {
+    throw "Expected 23 runtime assemblies, found $($inventory.Count) inventory entries."
 }
 
 $duplicates = $inventory | Group-Object assembly | Where-Object Count -gt 1
@@ -49,10 +61,26 @@ if (Compare-Object $expectedAssemblies $actualAssemblies) {
     throw 'Vendored DLL filenames do not exactly match their inventories.'
 }
 
-foreach ($assemblyFile in @(foreach ($pluginRoot in $pluginRoots) { Get-ChildItem -LiteralPath $pluginRoot -File -Filter '*.dll' })) {
-    $identity = [Reflection.AssemblyName]::GetAssemblyName($assemblyFile.FullName)
-    if (($identity.Name -eq 'System.Text.Json' -or $identity.Name -like 'Microsoft.AspNetCore.SignalR.*') -and $identity.Version.Major -eq 8) {
-        throw "SignalR 8 / System.Text.Json 8 assembly detected in the vendored closure: $($assemblyFile.Name) ($identity)."
+if (-not (Test-Path -LiteralPath $noticesPath)) {
+    throw "Missing third-party notices: $noticesPath"
+}
+if ((Get-Content -Raw -LiteralPath $noticesPath) -notmatch 'Voxta\.Model\.dll') {
+    throw 'Third-party notices must state the first-party licensing of Voxta.Model.dll.'
+}
+$notices = Get-Content -Raw -LiteralPath $noticesPath
+$unlisted = @($thirdPartyInventory | Where-Object { $notices -notmatch "(?m)^  - $([regex]::Escape($_.packageId))?$" } | ForEach-Object packageId)
+if ($unlisted) {
+    throw "Third-party notices do not list: $($unlisted -join ', ')"
+}
+if ($voxtaInventory[0].license -ne 'first-party:Unity Asset Store EULA') {
+    throw "Voxta.Model inventory license must be 'first-party:Unity Asset Store EULA', found '$($voxtaInventory[0].license)'."
+}
+
+foreach ($assembly in $unity65SuppliedAssemblies) {
+    $metaPath = Join-Path $thirdPartyRoot "$assembly.meta"
+    if ((Get-Content -Raw -LiteralPath $metaPath) -notmatch "(?m)^  defineConstraints:?
+  - '!UNITY_6000_5_OR_NEWER'") {
+        throw "$assembly must be constrained to '!UNITY_6000_5_OR_NEWER'; Unity 6.5+ supplies its own copy."
     }
 }
 
@@ -62,8 +90,8 @@ $lockDependencies = $lock.dependencies.'.NETStandard,Version=v2.1'
 foreach ($entry in $inventory) {
     $assemblyPath = Join-Path $entry.pluginRoot $entry.assembly
     $assemblyVersion = [Reflection.AssemblyName]::GetAssemblyName($assemblyPath).Version
-    if (($entry.assembly -eq 'System.Text.Json.dll' -or $entry.assembly -like 'Microsoft.AspNetCore.SignalR.*.dll') -and $assemblyVersion.Major -ne 10) {
-        throw "Expected a 10.x $($entry.assembly) assembly, found $assemblyVersion."
+    if (($entry.assembly -eq 'System.Text.Json.dll' -or $entry.assembly -like 'Microsoft.AspNetCore.SignalR.*.dll') -and $assemblyVersion.Major -ne 8) {
+        throw "Expected an 8.x $($entry.assembly) assembly to match Unity 6.5+'s System.Text.Json 8, found $assemblyVersion."
     }
     $assemblyHash = (Get-FileHash -LiteralPath $assemblyPath -Algorithm SHA512).Hash
     if ($assemblyHash -ne $entry.assemblySha512) {
@@ -73,11 +101,6 @@ foreach ($entry in $inventory) {
     $lockEntry = $lockDependencies.($entry.packageId)
     if ($null -eq $lockEntry -or $lockEntry.resolved -ne $entry.version -or $lockEntry.contentHash -ne $entry.packageSha512) {
         throw "Restore lock data does not match inventory for $($entry.packageId) $($entry.version)."
-    }
-
-    $licenseName = "org.nuget.$($entry.packageId.ToLowerInvariant())-License.md"
-    if (-not (Test-Path -LiteralPath (Join-Path $entry.pluginRoot "licenses/$licenseName"))) {
-        throw "Missing license notice for $($entry.packageId): $licenseName"
     }
 
     if ($VerifyPackageAssets) {

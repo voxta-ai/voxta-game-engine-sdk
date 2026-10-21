@@ -14,8 +14,8 @@ $dataDirectory = Join-Path $playerDirectory "${playerName}_Data"
 if (-not (Test-Path -LiteralPath $dataDirectory -PathType Container)) { throw "Player data directory was not found: $dataDirectory" }
 
 $inventoryPaths = @(
-    (Join-Path $RepositoryRoot 'unity/Runtime/Plugins/ThirdParty/RUNTIME-MODEL-DEPENDENCY-INVENTORY.json'),
-    (Join-Path $RepositoryRoot 'unity/Runtime/Plugins/Voxta/VOXTA-MODEL-INVENTORY.json')
+    (Join-Path $RepositoryRoot 'Tools/ModelDependencies/VoxtaModel/Inventory/RUNTIME-MODEL-DEPENDENCY-INVENTORY.json'),
+    (Join-Path $RepositoryRoot 'Tools/ModelDependencies/VoxtaModel/Inventory/VOXTA-MODEL-INVENTORY.json')
 )
 foreach ($inventoryPath in $inventoryPaths) {
     if (-not (Test-Path -LiteralPath $inventoryPath -PathType Leaf)) { throw "Runtime dependency inventory was not found: $inventoryPath" }

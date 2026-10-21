@@ -3,9 +3,9 @@ using Voxta.Model.Shared;
 using Voxta.Model.WebsocketMessages.ClientMessages;
 using Voxta.Model.WebsocketMessages.ServerMessages;
 
-namespace Voxta.Unity
+namespace Voxta.GameEngine
 {
-    /// <summary>The M1 text-only chat lifecycle for one server chat session.</summary>
+    /// <summary>The chat lifecycle for one server chat session.</summary>
     public sealed class VoxtaChatSession : IDisposable
     {
         private readonly VoxtaClient client;

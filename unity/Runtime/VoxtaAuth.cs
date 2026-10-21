@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Voxta.Unity
+namespace Voxta.GameEngine
 {
     /// <summary>Persists the application API key acquired through device authorization.</summary>
     public interface IVoxtaTokenStore
@@ -18,7 +18,7 @@ namespace Voxta.Unity
     /// <summary>Stores a device-flow API key in Unity PlayerPrefs.</summary>
     public sealed class PlayerPrefsTokenStore : IVoxtaTokenStore
     {
-        private const string DefaultKey = "Voxta.Unity.AccessToken";
+        private const string DefaultKey = "Voxta.GameEngine.AccessToken";
         private readonly string key;
 
         public PlayerPrefsTokenStore(string key = DefaultKey)

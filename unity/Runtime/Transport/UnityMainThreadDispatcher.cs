@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using UnityEngine;
 
-namespace Voxta.Unity.Transport
+namespace Voxta.GameEngine.Transport
 {
     /// <summary>Routes networking completions to the Unity player loop.</summary>
     internal sealed class UnityMainThreadDispatcher : MonoBehaviour

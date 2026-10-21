@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
-namespace Voxta.Unity.Tests
+namespace Voxta.GameEngine.Tests
 {
     public sealed class VoxtaAuthTests
     {
