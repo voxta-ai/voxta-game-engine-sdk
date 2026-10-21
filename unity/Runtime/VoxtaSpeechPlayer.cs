@@ -6,12 +6,12 @@ using UnityEngine.Networking;
 using Voxta.Model.WebsocketMessages.ClientMessages;
 using Voxta.Model.WebsocketMessages.ServerMessages;
 
-namespace Voxta.Unity
+namespace Voxta.GameEngine
 {
     [Serializable]
     public struct VoxtaSpeechPlaybackMetrics
     {
-        public Guid MessageId;
+        [NonSerialized] public Guid MessageId;
         public int StartIndex;
         public int EndIndex;
         public double DurationSeconds;

@@ -4,7 +4,7 @@ using UnityEngine;
 using Voxta.Model.Shared;
 using Voxta.Model.WebsocketMessages.ServerMessages;
 
-namespace Voxta.Unity.Samples.BasicIntegration
+namespace Voxta.GameEngine.Samples.BasicIntegration
 {
     /// <summary>Renders a minimal text chat panel without requiring a UI prefab.</summary>
     public sealed class BasicIntegrationSample : MonoBehaviour
@@ -22,6 +22,9 @@ namespace Voxta.Unity.Samples.BasicIntegration
         private bool authorizationComplete;
         private string voiceFeedback = "Microphone is waiting for a server recording request.";
         private string actionFeedback = "No game action has been invoked yet.";
+        private string pendingToken;
+        private string characterIdInput = string.Empty;
+        private string characterIdError;
 
         private void Awake()
         {
@@ -97,7 +100,7 @@ namespace Voxta.Unity.Samples.BasicIntegration
                 if (await authorization.ValidateStoredTokenAsync(cancellationToken))
                 {
                     AddDiagnostic("Using the saved device authorization.");
-                    Connect(authorization.StoredToken);
+                    ConnectWhenCharacterIsSet(authorization.StoredToken);
                     return;
                 }
 
@@ -107,7 +110,7 @@ namespace Voxta.Unity.Samples.BasicIntegration
                 AddDiagnostic("Open " + deviceCode.VerificationUrl + " and enter code " + deviceCode.UserCode + ".");
                 var token = await authorization.WaitForTokenAsync(deviceCode, cancellationToken);
                 AddDiagnostic("Device authorization approved.");
-                Connect(token);
+                ConnectWhenCharacterIsSet(token);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -118,6 +121,40 @@ namespace Voxta.Unity.Samples.BasicIntegration
                 status = exception.Message;
                 AddDiagnostic("ERROR: " + exception);
             }
+        }
+
+        // The chat starts as soon as the server welcomes the client, so the character must be known before connecting.
+        private void ConnectWhenCharacterIsSet(string token)
+        {
+            deviceCode = null;
+            if (Guid.TryParse(companion.CharacterId, out _))
+            {
+                Connect(token);
+                return;
+            }
+
+            pendingToken = token;
+            characterIdInput = companion.CharacterId ?? string.Empty;
+            status = "Enter a character ID to start chatting";
+            AddDiagnostic("No valid character ID is set on the Voxta Companion; enter one in the panel to start the chat.");
+        }
+
+        private void SubmitCharacterId()
+        {
+            var value = characterIdInput.Trim();
+            if (!Guid.TryParse(value, out _))
+            {
+                characterIdError = string.IsNullOrEmpty(value)
+                    ? "A character ID is required."
+                    : "'" + value + "' is not a GUID. Copy the character's ID from your Voxta server.";
+                return;
+            }
+
+            companion.SetCharacterId(value);
+            characterIdError = null;
+            var token = pendingToken;
+            pendingToken = null;
+            Connect(token);
         }
 
         private void Connect(string token)
@@ -147,7 +184,11 @@ namespace Voxta.Unity.Samples.BasicIntegration
 
         private void RenderAuthorization()
         {
-            if (deviceCode != null)
+            if (pendingToken != null)
+            {
+                RenderCharacterPrompt();
+            }
+            else if (deviceCode != null)
             {
                 GUILayout.Label("Verification URL: " + deviceCode.VerificationUrl);
                 GUILayout.Label("Code: " + deviceCode.UserCode);
@@ -157,6 +198,14 @@ namespace Voxta.Unity.Samples.BasicIntegration
             {
                 GUILayout.Label("Waiting for device authorization.");
             }
+        }
+
+        private void RenderCharacterPrompt()
+        {
+            GUILayout.Label("Character ID (the character's GUID on your Voxta server):");
+            characterIdInput = GUILayout.TextField(characterIdInput);
+            if (characterIdError != null) GUILayout.Label(characterIdError);
+            if (GUILayout.Button("Start Chat")) SubmitCharacterId();
         }
 
         private void RenderChat()

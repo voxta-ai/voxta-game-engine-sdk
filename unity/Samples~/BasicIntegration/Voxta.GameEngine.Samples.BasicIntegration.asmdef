@@ -1,0 +1,14 @@
+{
+  "name": "Voxta.GameEngine.Samples.BasicIntegration",
+  "rootNamespace": "Voxta.GameEngine.Samples.BasicIntegration",
+  "references": ["Voxta.GameEngine.Runtime"],
+  "includePlatforms": ["Editor", "LinuxStandalone64", "macOSStandalone", "WindowsStandalone64"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": ["Voxta.Model.dll"],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

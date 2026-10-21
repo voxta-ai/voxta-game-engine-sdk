@@ -5,7 +5,7 @@ using Voxta.Model.Shared;
 using Voxta.Model.WebsocketMessages.ClientMessages;
 using Voxta.Model.WebsocketMessages.ServerMessages;
 
-namespace Voxta.Unity
+namespace Voxta.GameEngine
 {
     [Serializable] public sealed class VoxtaActionUnityEvent : UnityEngine.Events.UnityEvent<ServerActionMessage> { }
 

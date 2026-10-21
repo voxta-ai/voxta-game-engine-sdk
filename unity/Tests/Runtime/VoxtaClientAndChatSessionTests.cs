@@ -6,9 +6,9 @@ using NUnit.Framework;
 using Voxta.Model.Shared;
 using Voxta.Model.WebsocketMessages.ClientMessages;
 using Voxta.Model.WebsocketMessages.ServerMessages;
-using Voxta.Unity.Transport;
+using Voxta.GameEngine.Transport;
 
-namespace Voxta.Unity.Tests
+namespace Voxta.GameEngine.Tests
 {
     public sealed class VoxtaClientAndChatSessionTests
     {

@@ -3,7 +3,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Voxta.Unity.Tests
+namespace Voxta.GameEngine.Tests
 {
     public sealed class VoxtaCompanionPrefabTests
     {
@@ -38,6 +38,47 @@ namespace Voxta.Unity.Tests
             Assert.That(instance.GetComponent<AudioListener>(), Is.Null);
 
             Object.Destroy(instance);
+        }
+
+        [Test]
+        public void SetCharacterIdAcceptsOnlyGuids()
+        {
+            var gameObject = new GameObject("Companion");
+            gameObject.SetActive(false);
+            try
+            {
+                var companion = gameObject.AddComponent<VoxtaCompanion>();
+                Assert.Throws<System.ArgumentException>(() => companion.SetCharacterId(""));
+                Assert.Throws<System.ArgumentException>(() => companion.SetCharacterId("not-a-guid"));
+
+                const string id = "11111111-2222-3333-4444-555555555555";
+                companion.SetCharacterId(id);
+                Assert.That(companion.CharacterId, Is.EqualTo(id));
+            }
+            finally
+            {
+                Object.DestroyImmediate(gameObject);
+            }
+        }
+
+        [Test]
+        public void ComponentAccessorsResolveBeforeCompanionAwake()
+        {
+            var gameObject = new GameObject("Companion");
+            gameObject.SetActive(false);
+            try
+            {
+                var companion = gameObject.AddComponent<VoxtaCompanion>();
+                var actions = gameObject.AddComponent<VoxtaActions>();
+                var microphone = gameObject.AddComponent<VoxtaMicrophone>();
+
+                Assert.That(companion.Actions, Is.SameAs(actions));
+                Assert.That(companion.Microphone, Is.SameAs(microphone));
+            }
+            finally
+            {
+                Object.DestroyImmediate(gameObject);
+            }
         }
     }
 }

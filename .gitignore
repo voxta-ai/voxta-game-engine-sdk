@@ -126,3 +126,6 @@ InitTestScene*.unity*
 
 # JetBrains project metadata.
 .idea/
+
+# Closure probe restore output
+/Tools/ModelDependencies/VoxtaModel/Probe/obj/

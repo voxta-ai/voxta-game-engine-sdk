@@ -1,12 +1,17 @@
 using System;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Protocol;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Voxta.Model.Serialization;
 using Voxta.Model.WebsocketMessages.ClientMessages;
 using Voxta.Model.WebsocketMessages.ServerMessages;
-using Voxta.Unity.Transport;
+using Voxta.GameEngine.Transport;
 
-namespace Voxta.Unity.Tests
+namespace Voxta.GameEngine.Tests
 {
     public sealed class TransportTests
     {
@@ -86,6 +91,20 @@ namespace Voxta.Unity.Tests
             {
                 transport.DisposeAsync().AsTask().GetAwaiter().GetResult();
             }
+        }
+
+        [Test]
+        public void HubFramesCarryTheClientMessageDiscriminator()
+        {
+            var protocol = new JsonHubProtocol(Options.Create(new JsonHubProtocolOptions
+            {
+                PayloadSerializerOptions = VoxtaJsonSerializer.CreateSerializeOptions()
+            }));
+            var argument = VoxtaSignalRTransport.ToHubArgument(new ClientAuthenticateMessage { Client = "test", ClientVersion = "1.0" });
+
+            var frame = Encoding.UTF8.GetString(protocol.GetMessageBytes(new InvocationMessage("SendMessage", new object[] { argument })).ToArray());
+
+            StringAssert.Contains("\"arguments\":[{\"$type\":\"authenticate\"", frame);
         }
 
         private static void InvokeReceiveMessage(VoxtaSignalRTransport transport, string json)

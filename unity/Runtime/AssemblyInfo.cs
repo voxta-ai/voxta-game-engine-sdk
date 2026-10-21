@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Voxta.Unity.Runtime.Tests")]
+[assembly: InternalsVisibleTo("Voxta.GameEngine.Runtime.Tests")]

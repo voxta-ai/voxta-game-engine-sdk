@@ -8,7 +8,7 @@ using Voxta.Model.Shared;
 using Voxta.Model.WebsocketMessages.ClientMessages;
 using Voxta.Model.WebsocketMessages.ServerMessages;
 
-namespace Voxta.Unity.Tests
+namespace Voxta.GameEngine.Tests
 {
     public sealed class ModelProtocolTests
     {
@@ -17,12 +17,12 @@ namespace Voxta.Unity.Tests
         {
             var json = JsonSerializer.Serialize<ClientMessage>(new ClientAuthenticateMessage
             {
-                Client = "Voxta Unity SDK",
-                ClientVersion = "0.1.0-beta.1"
+                Client = "Voxta Game Engine SDK",
+                ClientVersion = "0.1.0-beta.2"
             }, VoxtaJsonSerializer.CreateSerializeOptions());
 
             StringAssert.Contains("\"$type\":\"authenticate\"", json);
-            StringAssert.Contains("\"client\":\"Voxta Unity SDK\"", json);
+            StringAssert.Contains("\"client\":\"Voxta Game Engine SDK\"", json);
         }
 
         [Test]
@@ -33,11 +33,11 @@ namespace Voxta.Unity.Tests
 
             AssertWireFrame(new ClientAuthenticateMessage
             {
-                Client = "Voxta Unity SDK",
-                ClientVersion = "0.1.0-beta.1"
+                Client = "Voxta Game Engine SDK",
+                ClientVersion = "0.1.0-beta.2"
             }, "authenticate", payload =>
             {
-                Assert.That(payload.GetProperty("client").GetString(), Is.EqualTo("Voxta Unity SDK"));
+                Assert.That(payload.GetProperty("client").GetString(), Is.EqualTo("Voxta Game Engine SDK"));
             });
             AssertWireFrame(new ClientStartChatMessage
             {
@@ -132,8 +132,8 @@ namespace Voxta.Unity.Tests
         {
             var json = JsonSerializer.Serialize(new ClientAuthenticateMessage
             {
-                Client = "Voxta Unity SDK",
-                ClientVersion = "0.1.0-beta.1"
+                Client = "Voxta Game Engine SDK",
+                ClientVersion = "0.1.0-beta.2"
             }, VoxtaJsonSerializer.CreateSerializeOptions());
 
             StringAssert.DoesNotContain("\"$type\"", json);

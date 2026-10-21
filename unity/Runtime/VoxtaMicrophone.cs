@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using Voxta.Model.WebsocketMessages.ServerMessages;
-using Voxta.Unity.Transport;
+using Voxta.GameEngine.Transport;
 
-namespace Voxta.Unity
+namespace Voxta.GameEngine
 {
     /// <summary>Captures Unity microphone audio and streams PCM16 frames when the server requests recording.</summary>
     [DisallowMultipleComponent]

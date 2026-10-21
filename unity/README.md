@@ -5,6 +5,11 @@ server. The **Basic Chat Integration** sample is the fastest way to get a
 talking companion: text chat, microphone input, Unity-owned spatial reply audio,
 and a game-action callback are ready in one scene.
 
+Supported platforms: the Unity Editor and Windows x64, macOS, and Linux x64
+standalone players, with Mono or IL2CPP. The SDK works with any render pipeline;
+it has no materials or shaders. Its code is in the `Voxta.GameEngine`
+namespace.
+
 ## Quickstart: a talking companion in 15 minutes
 
 Before starting, run a Voxta server that has a character you can use. You need
@@ -16,14 +21,17 @@ local server URL `http://127.0.0.1:5384`.
 In Unity 2022.3 LTS or later:
 
 1. Open **Window > Package Manager**.
-2. Select **+ > Add package from git URL** and enter
-   `https://github.com/voxta-ai/voxta-game-engine-sdk.git?path=/unity#v0.1.0-beta.1`.
-   For a local checkout, use **Add package from disk** and select its
-   `unity/package.json` instead.
+2. Under **My Assets**, select **Voxta Game Engine SDK** and choose
+   **Download**, then **Import**.
+   To install from source instead, select **+ > Add package from git URL** and
+   enter
+   `https://github.com/voxta-ai/voxta-game-engine-sdk.git?path=/unity#v0.1.0-beta.2`,
+   or use **Add package from disk** and select a local checkout's
+   `unity/package.json`.
 3. Select **Voxta Game Engine SDK**, open **Samples**, and import **Basic Chat
    Integration**.
 4. Open
-   `Assets/Samples/Voxta Game Engine SDK/0.1.0-beta.1/Basic Chat Integration/BasicIntegration.unity`.
+   `Assets/Samples/Voxta Game Engine SDK/0.1.0-beta.2/Basic Chat Integration/BasicIntegration.unity`.
 
 Importing the sample places its `link.xml` under `Assets`, which is needed for
 IL2CPP builds. If you build a different scene with `VoxtaCompanion`, copy the
@@ -37,7 +45,7 @@ inspector, set:
 | Field | Value |
 | --- | --- |
 | **Server URL** | Your Voxta server's HTTP or HTTPS base URL. Keep `http://127.0.0.1:5384` for the default local server. |
-| **Character ID** | The required character GUID from Voxta. |
+| **Character ID** | The required character GUID from Voxta. If it is empty or invalid, the sample asks for it in its panel before connecting. |
 | **Scenario ID** | An optional scenario GUID. |
 | **API Key** | Leave empty. The sample obtains and stores its own device-flow token. |
 | **Local Server Audio Output** | Leave disabled so Unity receives reply-audio URLs and plays them itself. |
@@ -111,7 +119,7 @@ copy to update with `Samples~`.
 
 This prerelease replaces the generated protocol DTO namespace
 `Voxta.Unity.Protocol.Generated` with types supplied by the bundled
-`Voxta.Model` 1.11.0-beta.1 runtime dependency. Applications that use protocol
+`Voxta.Model` runtime dependency. Applications that use protocol
 messages in callbacks, `UnityEvent` bindings, or calls to `VoxtaClient.Send`
 must update their namespace imports and generic type arguments. See
 [`Documentation~/runtime-model-public-api-migration.md`](Documentation~/runtime-model-public-api-migration.md)
